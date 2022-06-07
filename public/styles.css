@@ -1,0 +1,49 @@
+body {
+  font-family: Barlow, sans-serif;
+  color: white;
+}
+
+.text-navbar {
+  color: white;
+  font-size: 16px;
+}
+
+.text-color {
+  color: rgb(255, 189, 89);
+  font-family: Barlow, sans-serif;
+}
+
+.bg-image {
+  background-image: url("/images/main.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  /* opacity: 0.5; */
+}
+
+.bg-transparent-black {
+  background: rgb(0, 0, 0, 0.8);
+}
+
+.main-btn {
+  background-color: rgb(255, 189, 89);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.main-btn:hover {
+  color: rgb(214, 158, 73);
+  background-color: white;
+  border: 2px solid rgb(255, 189, 89);
+  border-radius: 10px;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+}
+
+.nav-link:hover {
+  background-color: rgb(255, 189, 89);
+  border-radius: 10px;
+  color: black;
+}
