@@ -1,7 +1,6 @@
 import jsSha from "jssha";
 
 const { SALT } = process.env;
-console.log("salt", SALT);
 
 const getHash = (input) => {
   //create new SHA object

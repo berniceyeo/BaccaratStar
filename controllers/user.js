@@ -1,5 +1,7 @@
 import getHash from "../helperfunctions/hash.js";
 import cookieParser from "cookie-parser";
+import validationTypes from "../helperfunctions/validation.js";
+import { response } from "express";
 
 class UserController {
   constructor(db) {
@@ -28,7 +30,13 @@ class UserController {
         res.cookie("username", user.username);
         res.redirect("/game");
       }
-    } catch {}
+    } catch (error) {
+      if (error.message === "Email does not exists") {
+        res.render("login", validationTypes.noUser);
+      } else if (error.message === "Password is incorrect") {
+        res.render("login", validationTypes.passwordIncorrect);
+      }
+    }
   };
 
   logoutUser = async (req, res) => {
@@ -61,3 +69,5 @@ class UserController {
     }
   };
 }
+
+export default UserController;

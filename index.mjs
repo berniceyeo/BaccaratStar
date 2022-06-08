@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
+import router from "./routes/authentication.routes.js";
 
 //Intialising the express instance
 const app = express();
@@ -14,8 +15,6 @@ app.use(methodOverride("_method"));
 // Expose the files stored in the public folder
 app.use(express.static("public"));
 
-app.get("/", (request, response) => {
-  response.render("main");
-});
+app.use("/", router);
 
 app.listen(3004);
