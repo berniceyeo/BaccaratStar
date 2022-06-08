@@ -55,7 +55,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active  text-navbar" href="#">Join Game</a>
+              <a class="nav-link active text-navbar" href="#">Join Game</a>
             </li>
           </ul>
         </div>
@@ -76,11 +76,15 @@
             novalidate
           >
             <div class="mb-3">
-              <label for="email" class="form-label <%=emailvalid %>"
-                >Email address</label
-              >
-              <input type="email" class="form-control" id="email" required />
-              <div class="invalid-feedback">
+              <label for="email" class="form-label">Email address</label>
+              <input
+                type="email"
+                class="form-control <%=emailvalid %>"
+                id="email"
+                name="email"
+                required
+              />
+              <div class="invalid-feedback text-second">
                 <%= emailfeedback %>
               </div>
             </div>
@@ -90,19 +94,20 @@
                 type="password"
                 class="form-control <%=pwvalid %>"
                 id="password"
+                name="password"
                 required
               />
-              <div class="invalid-feedback">
+              <div class="invalid-feedback text-second">
                 <%= pwfeedback %>
               </div>
             </div>
             <button type="submit" class="main-btn">Submit</button>
-            <div class="mt-3">
-              <a href="/signup" class="text-color"
-                >Not yet a baccarat star, signup here!</a
-              >
-            </div>
           </form>
+          <div class="mt-3">
+            <a href="/signup" class="link"
+              >Not yet a baccarat star, signup here!</a
+            >
+          </div>
         </div>
       </div>
     </div>

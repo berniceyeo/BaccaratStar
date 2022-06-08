@@ -22,9 +22,10 @@ app.use(methodOverride("_method"));
 app.use(express.static("public"));
 // Bind Express middleware to parse request bodies for POST requests
 app.use(express.urlencoded({ extended: false }));
+// app.use(express.json());
 
 app.use(cookieParser());
 
 app.use("/", router);
 
-app.listen(3004);
+app.listen(PORT);

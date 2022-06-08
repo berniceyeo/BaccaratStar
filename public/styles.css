@@ -13,6 +13,11 @@ body {
   font-family: Barlow, sans-serif;
 }
 
+.link {
+  color: rgb(214, 158, 73);
+  font-family: Barlow, sans-serif;
+}
+
 .bg-image {
   background-image: url("/images/main.jpg");
   background-repeat: no-repeat;
@@ -42,8 +47,14 @@ body {
   width: 50%;
 }
 
+.link:hover {
+  color: white;
+  cursor: pointer;
+}
+
 .nav-link:hover {
   background-color: rgb(255, 189, 89);
   border-radius: 10px;
   color: black;
+  cursor: pointer;
 }

@@ -10,7 +10,6 @@ class UserController {
 
   loginUser = async (req, res) => {
     try {
-      console.log(req.body);
       const { email, password } = req.body;
       const checkEmail = await this.db.User.findOne({
         where: {
@@ -64,11 +63,15 @@ class UserController {
         throw new Error("user already exists");
       }
 
+      const hashedPassword = getHash(password);
+
       const newUser = await this.db.User.create({
         username: username,
         email: email,
-        password: password,
+        password: hashedPassword,
       });
+
+      res.redirect("/login");
     } catch (error) {
       if (error.message === "user already exists") {
         res.render("signup", validationTypes.userExists);
