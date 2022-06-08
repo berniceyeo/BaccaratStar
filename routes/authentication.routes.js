@@ -6,6 +6,10 @@ import UserController from "../controllers/user.js";
 const router = Router();
 const userController = new UserController(db);
 
+router.get("/", (req, res) => {
+  res.render("main");
+});
+
 router.get("/login", (req, res) => {
   res.render("login", validationTypes.emptyValidation);
 });

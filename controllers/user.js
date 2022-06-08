@@ -10,9 +10,12 @@ class UserController {
 
   loginUser = async (req, res) => {
     try {
-      const { username, email, password } = req.body;
+      console.log(req.body);
+      const { email, password } = req.body;
       const checkEmail = await this.db.User.findOne({
-        email: email,
+        where: {
+          email: email,
+        },
       });
 
       if (checkEmail === null) {
@@ -35,6 +38,8 @@ class UserController {
         res.render("login", validationTypes.noUser);
       } else if (error.message === "Password is incorrect") {
         res.render("login", validationTypes.passwordIncorrect);
+      } else {
+        console.log(error);
       }
     }
   };
@@ -65,7 +70,9 @@ class UserController {
         password: password,
       });
     } catch (error) {
-      console.log(error);
+      if (error.message === "user already exists") {
+        res.render("signup", validationTypes.userExists);
+      }
     }
   };
 }
