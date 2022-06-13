@@ -18,6 +18,13 @@ body {
   font-family: Barlow, sans-serif;
 }
 
+.seats {
+  border: 2px dashed white;
+  color: white;
+  font-family: Barlow, sans-serif;
+  background-color: transparent;
+}
+
 .bg-image {
   background-image: url("/images/main.jpg");
   background-repeat: no-repeat;
@@ -27,6 +34,12 @@ body {
 
 .bg-transparent-black {
   background: rgb(0, 0, 0, 0.8);
+}
+
+.bg-table {
+  background-image: url("/images/poker-table.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 .main-btn {
@@ -50,6 +63,13 @@ body {
 .link:hover {
   color: white;
   cursor: pointer;
+}
+
+.seats:hover {
+  border: 2px dashed rgb(214, 158, 73);
+  background-color: white;
+  color: rgb(214, 158, 73);
+  font-family: Barlow, sans-serif;
 }
 
 .nav-link:hover {

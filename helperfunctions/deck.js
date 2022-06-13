@@ -9,14 +9,19 @@ const createDeck = () => {
   suits.forEach((suit) => {
     for (let rank = 0; rank <= 13; rank++) {
       let cardName = rank;
+      let points = rank;
+
       if (cardName === 1) {
         cardName = "ace";
       } else if (cardName === 11) {
         cardName = "jack";
+        points = 10;
       } else if (cardName === 12) {
         cardName = "queen";
+        points = 10;
       } else if (cardName === 13) {
         cardName = "king";
+        points = 10;
       }
 
       const card = {

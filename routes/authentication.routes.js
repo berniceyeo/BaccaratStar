@@ -21,5 +21,8 @@ router.get("/signup", (req, res) => {
 });
 
 router.post("/signup", userController.createUser);
+router.get("/game", (req, res) => {
+  res.render("game");
+});
 
 export default router;
