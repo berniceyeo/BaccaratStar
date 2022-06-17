@@ -1,10 +1,9 @@
-import sequelizePackage from "sequelize";
+import sequelizePackage, { BelongsToMany } from "sequelize";
 import allConfig from "../../sequelize.config.cjs";
 
 // importing models
 import initUserModel from "./user.mjs";
 import initRoomModel from "./room.mjs";
-import initUserRoomModel from "./user_room.mjs";
 
 const { Sequelize } = sequelizePackage;
 const env = process.env.NODE_ENV || "development";
@@ -21,11 +20,14 @@ const sequelize = new Sequelize(
 
 db.User = initUserModel(sequelize, Sequelize.DataTypes);
 db.Room = initRoomModel(sequelize, Sequelize.DataTypes);
-db.UserRoom = initUserRoomModel(sequelize, Sequelize.DataTypes);
 
-//---------------------------------
-//             Relationships
-//--------------------------------
+//------------------------------------------------------------------
+//                            Relationships
+//------------------------------------------------------------------
+
+//1-M relationships: User can only exist in one room, but one room can have many users
+db.Room.hasMany(db.User);
+db.User.belongsTo(db.Room);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

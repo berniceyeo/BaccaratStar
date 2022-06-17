@@ -4,20 +4,145 @@
   <body>
     <%- include("navbar") %>
     <div
+      id="table"
       class="container-fluid bg-table h-auto position-relative"
       style="min-height: 89.1vh;"
     >
-    <button id="seat-1" class="position-absolute p-4 seats" style="width:12%; top: 10%; left: 31%">Sit</button>
-    <button id="seat-2" class="position-absolute p-4 seats" style="width:12%; top: 10%; left: 53%">Sit</button>
-    <button id="seat-3" class="position-absolute p-4 seats" style="width:12%; top: 18%; left: 12%">Sit</button>
-    <button id="seat-4" class="position-absolute p-4 seats" style="width:12%; top: 18%; right: 12%">Sit</button>
-    <button id="seat-5" class="position-absolute p-4 seats" style="width:12%; top: 35%; left: 7%">Sit</button>
-    <button id="seat-6" class="position-absolute p-4 seats" style="width:12%; top: 35%; right: 7%">Sit</button>
-    <button id="seat-8" class="position-absolute p-4 seats" style="width:12%; top: 53%; left: 7%">Sit</button>
-    <button id="seat-9" class="position-absolute p-4 seats" style="width:12%; top: 53%; right: 7%">Sit</button>
-    <button id="seat-10" class="position-absolute p-4 seats" style="width:12%; bottom: 20%; left: 12%">Sit</button>
-    <button id="seat-11" class="position-absolute p-4 seats" style="width:12%; bottom: 20%; right: 12%">Sit</button>
-    <button id="main-seat" class="position-absolute p-4 seats" style="width:20%; bottom: 10%; left: 40%">Main Hand</button>
+      <!-- OPTIONS FORM -->
+      <div
+        id="create-or-join"
+        style="background-color: rgb(0,0, 0, 0.7); min-height: 89.1vh; display: flex;"
+      >
+        <div style="width:60%; margin: auto; align-content: center;">
+          <div class="row p-1">
+            <div class="col-5 press-form">
+              <h2 style="color: white;">Be a <br />Creator!</h2>
+              <br />
+              <button id="get-create-room" class="main-btn">Create Game</button>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-5 press-form">
+              <h2 style="color:white ;">
+                Play with Friends!
+              </h2>
+              <br />
+              <button id="get-join-room" class="main-btn">
+                Join Game
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- CREATE ROOM FORM -->
+      <div
+        id="create-room"
+        style="background-color: rgb(0,0, 0, 0.7); min-height: 89.1vh; display: flex;"
+        hidden
+      >
+        <div
+          style="width:50%; margin: auto; align-content: center; text-align: start;"
+        >
+          <%- include("room-form", {form: "create"}) %>
+
+          <button id="create-room-btn" class="main-btn">Create Game</button>
+        </div>
+      </div>
+
+      <!-- JOIN ROOM FORM -->
+      <div
+        id="join-room"
+        style="background-color: rgb(0,0, 0, 0.7); min-height: 89.1vh; display: flex;"
+        hidden
+      >
+        <div style="width:50%; margin: auto; align-content: center;">
+          <%- include("room-form", {form: "join"}) %>
+          <button id="join-room-btn" class="main-btn">Join Game</button>
+        </div>
+      </div>
+
+      <!-- SEATS  -->
+      <div id="seats" hidden>
+        <button
+          id="seat-1"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 10%; left: 31%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-2"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 10%; left: 53%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-3"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 18%; left: 12%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-4"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 18%; right: 12%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-5"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 35%; left: 7%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-6"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 35%; right: 7%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-8"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 53%; left: 7%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-9"
+          class="position-absolute p-4 seats"
+          style="width:12%; top: 53%; right: 7%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-10"
+          class="position-absolute p-4 seats"
+          style="width:12%; bottom: 20%; left: 12%"
+        >
+          Sit
+        </button>
+        <button
+          id="seat-11"
+          class="position-absolute p-4 seats"
+          style="width:12%; bottom: 20%; right: 12%"
+        >
+          Sit
+        </button>
+        <button
+          id="main-seat"
+          class="position-absolute p-4 seats"
+          style="width:20%; bottom: 10%; left: 40%"
+        >
+          Main Hand
+        </button>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/script.js"></script>
   </body>
 </html>

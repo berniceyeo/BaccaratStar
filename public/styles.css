@@ -25,6 +25,13 @@ body {
   background-color: transparent;
 }
 
+.press-form {
+  background-color: rgb(255, 255, 255, 0.6);
+  border-radius: 10%;
+  padding: 30px;
+  text-align: center;
+}
+
 .bg-image {
   background-image: url("/images/main.jpg");
   background-repeat: no-repeat;
@@ -45,6 +52,7 @@ body {
 .main-btn {
   background-color: rgb(255, 189, 89);
   padding: 10px;
+  border: transparent;
   border-radius: 10px;
 }
 

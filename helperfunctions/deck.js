@@ -2,7 +2,7 @@ const getRandomIndex = (num) => {
   return Math.floor(Math.random() * (num + 1));
 };
 
-const createDeck = () => {
+export const createDeck = () => {
   const deck = [];
   const suits = ["hearts", "diamonds", "spades", "clubs"];
 
@@ -37,7 +37,7 @@ const createDeck = () => {
   return deck;
 };
 
-const shuffleDeck = (deck) => {
+export const shuffleDeck = (deck) => {
   for (let currentIndex = 0; currentIndex < deck.length; currentIndex++) {
     const randomIndex = getRandomIndex(deck.length);
     const currentItem = deck[currentIndex];

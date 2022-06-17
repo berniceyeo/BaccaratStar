@@ -4,7 +4,8 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
 
-import router from "./routes/authentication.routes.js";
+import userRouter from "./routes/authentication.routes.js";
+import gameRouter from "./routes/game.routes.js";
 
 // CREATING THE APP
 const app = express();
@@ -22,10 +23,12 @@ app.use(methodOverride("_method"));
 app.use(express.static("public"));
 // Bind Express middleware to parse request bodies for POST requests
 app.use(express.urlencoded({ extended: false }));
-// app.use(express.json());
+//  data in AJAX POST requests is packaged differently from those in form submissions
+app.use(express.json());
 
 app.use(cookieParser());
 
-app.use("/", router);
+app.use("/", userRouter);
+app.use("/", gameRouter);
 
 app.listen(PORT);

@@ -1,7 +1,6 @@
 import getHash from "../helperfunctions/hash.js";
 import cookieParser from "cookie-parser";
 import validationTypes from "../helperfunctions/validation.js";
-import { response } from "express";
 
 class UserController {
   constructor(db) {
@@ -28,7 +27,8 @@ class UserController {
       if (hashDBPassword === hashSentPassword) {
         throw new Error("Password is incorrect");
       } else {
-        res.cookie("userId", getHash(user.id));
+        res.cookie("hashedSession", getHash(user.id));
+        res.cookie("userId", user.id);
         res.cookie("username", user.username);
         res.redirect("/game");
       }
@@ -45,6 +45,7 @@ class UserController {
 
   logoutUser = async (req, res) => {
     res.clearCookie("userId");
+    res.clearCookie("hashedSession");
     res.clearCookie("username");
     res.redirect("/");
   };
@@ -76,6 +77,7 @@ class UserController {
       if (error.message === "user already exists") {
         res.render("signup", validationTypes.userExists);
       }
+      console.log(error);
     }
   };
 }
