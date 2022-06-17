@@ -38,7 +38,7 @@ class RoomController {
           banker: true,
           chips_bought: Number(chips),
           chips: Number(chips),
-          updatedAt: new Date(),
+          updatedAt: Date.now(),
         },
         {
           where: {
@@ -48,7 +48,7 @@ class RoomController {
         }
       );
       await transaction.commit();
-      res.send("done");
+      res.send("create room");
     } catch (error) {
       console.log(error);
       await transaction.rollback();
@@ -72,31 +72,51 @@ class RoomController {
         },
       });
 
+      if (findRoom === null) {
+        throw new Error("No such room exists");
+      }
+
       const findRoomJson = findRoom.toJSON();
       const roomId = findRoomJson.id;
+      const hashedPassword = getHash(password);
+      const storedPassword = getHash(findRoomJson.password);
+
+      if (storedPassword !== hashedPassword) {
+        throw new Error("Incorrect Password");
+      }
+
       const hashedRoom = getHash(roomId);
-      +res.cookie("session", hashedRoom);
+      res.cookie("session", hashedRoom);
 
       const association = await this.db.User.update(
         {
           room_id: Number(roomId),
-          banker: true,
+          banker: false,
           chips_bought: Number(chips),
           chips: Number(chips),
-          updatedAt: new Date(),
+          updatedAt: Date.now(),
         },
         {
           where: {
             id: userId,
           },
-          transaction,
         }
       );
-      await transaction.commit();
-      res.send("done");
+
+      res.send("join room");
     } catch (error) {
       console.log(error);
-      await transaction.rollback();
+      if (error.message === "Incorrect Password") {
+        const data = {
+          message: "Incorrect Password",
+        };
+        res.send(data);
+      } else if (error.message === "No such room exists") {
+        const data = {
+          message: "No such room exists",
+        };
+        res.send(data);
+      }
     }
   };
 }
