@@ -8,5 +8,6 @@ const roomController = new RoomController(db);
 
 router.post("/game/create", authenticate, roomController.createRoom);
 router.post("/game/join", authenticate, roomController.joinRoom);
+router.put("/game/seat", authenticate, roomController.sitDown);
 
 export default router;

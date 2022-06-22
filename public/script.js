@@ -1,4 +1,3 @@
-const mainForms = document.getElementById("create-or-join");
 // BUTTONS
 const showCreateRoomBtn = document.getElementById("get-create-room");
 const showJoinRoomBtn = document.getElementById("get-join-room");
@@ -6,10 +5,12 @@ const createRoomBtn = document.getElementById("create-room-btn");
 const joinRoomBtn = document.getElementById("join-room-btn");
 
 //SECTIONS
+const mainForms = document.getElementById("create-or-join");
 const seatsBefore = document.getElementById("seats-bef");
 const mainSeat = document.getElementById("main-seat");
 const createForm = document.getElementById("create-room");
 const joinForm = document.getElementById("join-room");
+const afterseating = document.getElementById("seats-after");
 
 //ERROR MESSAGES
 const createInvalidName = document.getElementById("create-name-invalid");
@@ -29,56 +30,6 @@ const joinFormName = document.getElementById("join-name");
 const joinFormPassword = document.getElementById("join-password");
 const joinFormChips = document.getElementById("join-chips");
 
-//HELPER FUNCIONS
-const toggleValidity = (element, validity) => {
-  if (validity === "valid") {
-    element.classList.remove("is-invalid");
-    element.classList.add("is-valid");
-  } else {
-    element.classList.remove("is-valid");
-    element.classList.add("is-invalid");
-  }
-};
-
-const checkBlanks = (
-  name,
-  password,
-  chips,
-  invalidName,
-  formName,
-  invalidPass,
-  formPass,
-  invalidChips,
-  formChips
-) => {
-  if (name === "") {
-    invalidName.innerHTML = "Please input a valid name";
-    invalidName.hidden = false;
-    toggleValidity(formName, "invalid");
-  } else {
-    invalidName.hidden = true;
-    toggleValidity(formName, "valid");
-  }
-
-  if (password === "") {
-    invalidPass.innerHTML = "Please input a valid password";
-    invalidPass.hidden = false;
-    toggleValidity(formPass, "invalid");
-  } else {
-    invalidPass.hidden = true;
-    toggleValidity(formPass, "valid");
-  }
-
-  if (chips === "") {
-    invalidChips.innerHTML = "Please input some chips you want to buy";
-    invalidChips.hidden = false;
-    toggleValidity(formChips, "invalid");
-  } else {
-    invalidChips.hidden = true;
-    toggleValidity(formChips, "valid");
-  }
-};
-
 //AJAX FUNCTIONS
 const showCreateForm = () => {
   mainForms.hidden = true;
@@ -90,6 +41,7 @@ const showJoinForm = () => {
   joinForm.hidden = false;
 };
 
+// create room jumps straight to the room, as the user cannot choose his seat.
 const createRoom = () => {
   try {
     const name = createFormName.value;
@@ -100,6 +52,8 @@ const createRoom = () => {
       password,
       chips,
     };
+
+    console.log(data);
 
     checkBlanks(
       name,
@@ -122,7 +76,7 @@ const createRoom = () => {
           toggleValidity(createFormName, "invalid");
         } else {
           createForm.hidden = true;
-          seatsBefore.hidden = false;
+          afterseating.hidden = false;
         }
       });
     }
@@ -166,6 +120,8 @@ const joinRoom = () => {
           joinInvalidPassword.hidden = false;
           toggleValidity(joinFormPassword, "invalid");
         } else {
+          console.log(response.data);
+          checkForSeated(response.data.users);
           joinForm.hidden = true;
           seatsBefore.hidden = false;
         }
@@ -176,28 +132,35 @@ const joinRoom = () => {
   }
 };
 
+const allSeats = document.getElementsByClassName("seats");
+
+const socket = io("http://localhost:3004");
+
+Array.from(allSeats).forEach((btn) => {
+  btn.addEventListener("click", function assignSeat(event) {
+    const seatId = Number(this.id.slice(5));
+    try {
+      const data = {
+        seatId,
+      };
+      axios.put("/game/seat", data).then((response) => {
+        if (response.data === "seated") {
+          afterseating.hidden = false;
+          seatsBefore.hidden = true;
+          reshuffleSeats(seatId);
+          socket.emit("seat", data);
+        }
+      });
+    } catch (error) {}
+  });
+});
+
 createRoomBtn.addEventListener("click", createRoom);
 joinRoomBtn.addEventListener("click", joinRoom);
 showCreateRoomBtn.addEventListener("click", showCreateForm);
 showJoinRoomBtn.addEventListener("click", showJoinForm);
 
-const allSeats = document.getElementsByClassName("seats");
-
-Array.from(allSeats).forEach((btn) => {
-  btn.addEventListener("click", function assignSeat(event) {
-    const seatId = Number(this.id.slice(-1));
-    console.log(seatId);
-    try {
-      const data = {
-        seatId,
-      };
-      // axios.put("/game/seat", data).then((response) => {
-
-      const afterseating = document.getElementById("seats-after");
-      afterseating.hidden = false;
-      seatsBefore.hidden = true;
-
-      // });
-    } catch (error) {}
-  });
+socket.on("seated", (data) => {
+  const occupiedSeat = document.getElementById(data.seatId);
+  occupiedSeat.classList.add("taken");
 });

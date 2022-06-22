@@ -5,8 +5,8 @@ import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
 
 //starting the socket
-// import { createServer } from "http";
-// import { Server } from "socket.io";
+import { createServer } from "http";
+import { Server } from "socket.io";
 // import init from "./init.socket.js";
 
 import userRouter from "./routes/authentication.routes.js";
@@ -14,8 +14,8 @@ import gameRouter from "./routes/game.routes.js";
 
 // CREATING THE APP
 const app = express();
-// const http = createServer(app);
-// const io = new Server(http);
+const http = createServer(app);
+const io = new Server(http);
 const PORT = process.env.PORT || 3004;
 
 // configure env variables
@@ -36,6 +36,15 @@ app.use(cookieParser());
 app.use("/", userRouter);
 app.use("/", gameRouter);
 
-// init(io);
+io.on("connection", (socket) => {
+  console.log("a user has logged in");
 
-app.listen(PORT);
+  socket.on("seat", async (data) => {
+    console.log("in the room", data);
+    socket.broadcast.emit("seated", data);
+  });
+});
+
+http.listen(PORT, () => {
+  console.log("application running at 3004");
+});

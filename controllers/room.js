@@ -1,6 +1,8 @@
 import getHash from "../helperfunctions/hash.js";
 import cookieParser from "cookie-parser";
 import sequelizePackage from "sequelize";
+import { Op } from "sequelize";
+
 const {
   DatabaseError,
   ValidationError,
@@ -39,6 +41,7 @@ class RoomController {
       const association = await this.db.User.update(
         {
           room_id: Number(roomId),
+          seat_id: 1,
           banker: true,
           chips_bought: Number(chips),
           chips: Number(chips),
@@ -112,7 +115,18 @@ class RoomController {
         }
       );
 
-      res.send("join room");
+      const seatsTaken = await this.db.Room.findOne({
+        where: {
+          id: roomId,
+        },
+        include: [
+          {
+            model: this.db.User,
+          },
+        ],
+      });
+
+      res.send(seatsTaken);
     } catch (error) {
       console.log(error);
       if (error.message === "Incorrect Password") {
@@ -126,6 +140,29 @@ class RoomController {
         };
         res.send(data);
       }
+    }
+  };
+
+  sitDown = async (req, res) => {
+    try {
+      const { seatId } = req.body;
+      const { userId } = req;
+
+      const updateUser = await this.db.User.update(
+        {
+          seat_id: Number(seatId),
+        },
+        {
+          where: {
+            id: userId,
+          },
+        }
+      );
+
+      res.send("seated");
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
     }
   };
 }

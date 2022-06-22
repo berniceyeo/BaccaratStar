@@ -43,17 +43,6 @@ getLoginPage.addEventListener("click", function() {
   landingPage.hidden = true;
 });
 
-//HELPER FUNCTIONS
-const toggleValidity = (element, validity) => {
-  if (validity === "valid") {
-    element.classList.remove("is-invalid");
-    element.classList.add("is-valid");
-  } else {
-    element.classList.remove("is-valid");
-    element.classList.add("is-invalid");
-  }
-};
-
 //LOGIN FUNCTIONS
 const postLogin = () => {
   try {
