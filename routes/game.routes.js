@@ -7,5 +7,6 @@ const router = Router();
 const roomController = new RoomController(db);
 
 router.post("/game/create", authenticate, roomController.createRoom);
+router.post("/game/join", authenticate, roomController.joinRoom);
 
 export default router;

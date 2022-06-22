@@ -10,7 +10,7 @@ export default function initRoomModel(sequelize, DataTypes) {
       },
       name: {
         type: DataTypes.INTEGER,
-        validate: { unique: true },
+        unique: true,
       },
       password: {
         type: DataTypes.STRING,

@@ -4,19 +4,24 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
 
+//starting the socket
+// import { createServer } from "http";
+// import { Server } from "socket.io";
+// import init from "./init.socket.js";
+
 import userRouter from "./routes/authentication.routes.js";
 import gameRouter from "./routes/game.routes.js";
 
 // CREATING THE APP
 const app = express();
+// const http = createServer(app);
+// const io = new Server(http);
 const PORT = process.env.PORT || 3004;
 
 // configure env variables
 const envFilePath = ".env";
 dotenv.config({ path: path.normalize(envFilePath) });
 
-// set  the express view engine to expect ejs templates
-app.set("view engine", "ejs");
 // Bind method override middleware to parse PUT and DELETE requests sent as POST requests
 app.use(methodOverride("_method"));
 // Expose the files stored in the public folder
@@ -30,5 +35,7 @@ app.use(cookieParser());
 
 app.use("/", userRouter);
 app.use("/", gameRouter);
+
+// init(io);
 
 app.listen(PORT);

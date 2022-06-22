@@ -1,5 +1,6 @@
 import getHash from "../helperfunctions/hash.js";
 import cookieParser from "cookie-parser";
+import { resolve } from "path";
 import validationTypes from "../helperfunctions/validation.js";
 
 class UserController {
@@ -30,13 +31,13 @@ class UserController {
         res.cookie("hashedSession", getHash(user.id));
         res.cookie("userId", user.id);
         res.cookie("username", user.username);
-        res.redirect("/game");
+        res.send("logged in");
       }
     } catch (error) {
       if (error.message === "Email does not exists") {
-        res.render("login", validationTypes.noUser);
+        res.send(error.message);
       } else if (error.message === "Password is incorrect") {
-        res.render("login", validationTypes.passwordIncorrect);
+        res.send(error.message);
       } else {
         console.log(error);
       }
@@ -61,7 +62,7 @@ class UserController {
       });
 
       if (checkEmail !== null) {
-        throw new Error("user already exists");
+        throw new Error("User already exists");
       }
 
       const hashedPassword = getHash(password);
@@ -72,10 +73,10 @@ class UserController {
         password: hashedPassword,
       });
 
-      res.redirect("/login");
+      res.send("signed up");
     } catch (error) {
-      if (error.message === "user already exists") {
-        res.render("signup", validationTypes.userExists);
+      if (error.message === "User already exists") {
+        res.send(error.message);
       }
       console.log(error);
     }

@@ -1,7 +1,11 @@
 import getHash from "../helperfunctions/hash.js";
 import cookieParser from "cookie-parser";
 import sequelizePackage from "sequelize";
-const { DatabaseError, ValidationError } = sequelizePackage;
+const {
+  DatabaseError,
+  ValidationError,
+  UniqueConstraintError,
+} = sequelizePackage;
 
 class RoomController {
   constructor(db) {
@@ -52,11 +56,16 @@ class RoomController {
     } catch (error) {
       console.log(error);
       await transaction.rollback();
-      if (error instanceof ValidationError) {
-        const error = {
+      if (error instanceof UniqueConstraintError) {
+        const data = {
           message: "room name is not unique",
         };
-        res.send(error);
+        res.send(data);
+      } else {
+        const data = {
+          message: error.message,
+        };
+        res.send(data);
       }
     }
   };
@@ -66,7 +75,7 @@ class RoomController {
       const { name, password, chips } = req.body;
       const { userId } = req;
 
-      const findRoom = await this.db.Room.findBy({
+      const findRoom = await this.db.Room.findOne({
         where: {
           name: name,
         },
@@ -79,7 +88,7 @@ class RoomController {
       const findRoomJson = findRoom.toJSON();
       const roomId = findRoomJson.id;
       const hashedPassword = getHash(password);
-      const storedPassword = getHash(findRoomJson.password);
+      const storedPassword = findRoomJson.password;
 
       if (storedPassword !== hashedPassword) {
         throw new Error("Incorrect Password");
