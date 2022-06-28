@@ -14,14 +14,23 @@ class RoomController {
     this.db = db;
   }
 
+  checkRoomSeat = async (req, res) => {
+    try {
+      const { userId } = req;
+      const user = await this.db.User.findByPk(userId);
+      const userDetails = user.toJSON();
+      res.send(userDetails);
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
   createRoom = async (req, res) => {
     const transaction = await this.db.sequelize.transaction();
     try {
       const { name, password, chips } = req.body;
       const { userId } = req;
-
-      console.log(req.body);
-
       const hashedPassword = getHash(password);
       const newRoom = await this.db.Room.create(
         {
@@ -36,7 +45,7 @@ class RoomController {
       const newRoomJson = newRoom.toJSON();
       const roomId = newRoomJson.id;
       const hashedRoom = getHash(roomId);
-      res.cookie("session", hashedRoom);
+      res.cookie("room", hashedRoom);
 
       const association = await this.db.User.update(
         {
@@ -98,7 +107,7 @@ class RoomController {
       }
 
       const hashedRoom = getHash(roomId);
-      res.cookie("session", hashedRoom);
+      res.cookie("room", hashedRoom);
 
       const association = await this.db.User.update(
         {
@@ -122,6 +131,12 @@ class RoomController {
         include: [
           {
             model: this.db.User,
+            //find users who are not banker and not null
+            where: {
+              seat_id: {
+                [Op.gt]: 1,
+              },
+            },
           },
         ],
       });
@@ -162,6 +177,78 @@ class RoomController {
       res.send("seated");
     } catch (error) {
       console.log(error);
+      res.send(error.message);
+    }
+  };
+
+  leaveRoom = async (req, res) => {
+    try {
+      const { userId } = req;
+      const user = await this.db.User.findByPk(userId);
+      const userJson = user.toJSON();
+
+      if (userJson.banker === true) {
+        throw new Error("User is banker");
+      } else {
+        await user.update({
+          banker: false,
+          room_id: null,
+          seat_id: null,
+          chips: null,
+          chips_bought: null,
+          updatedAt: Date.now(),
+        });
+
+        res.send("left room");
+      }
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
+  removeRoom = async (req, res) => {
+    const transaction = await this.db.sequelize.transaction();
+
+    try {
+      const { userId } = req;
+      const user = await this.db.User.findByPk(userId);
+      const userJson = user.toJSON();
+
+      if (userJson.banker === false) {
+        throw new Error("User is not banker");
+      }
+
+      const game = await this.db.Room.findByPk(userJson.room_id);
+      const allUsers = await game.getUsers();
+
+      for (let i = 0; i < allUsers.length; i++) {
+        await allUsers[i].update(
+          {
+            banker: false,
+            room_id: null,
+            seat_id: null,
+            chips: null,
+            chips_bought: null,
+            updatedAt: Date.now(),
+          },
+          {
+            transaction,
+          }
+        );
+        console.log(i);
+      }
+
+      await game.destroy({
+        transaction,
+      });
+
+      await transaction.commit();
+      res.clearCookie("room");
+      res.send("removed room");
+    } catch (error) {
+      console.log(error);
+      await transaction.rollback();
       res.send(error.message);
     }
   };

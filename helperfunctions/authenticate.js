@@ -19,6 +19,6 @@ export default function authenticate(req, res, next) {
     }
   } catch (error) {
     console.log(error);
-    res.redirect("/login");
+    res.redirect("/");
   }
 }

@@ -38,32 +38,20 @@
       class="navbar navbar-dark navbar-expand-sm bg-black h-auto d-flex align-items-center shadow"
     >
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="http://localhost:3004/">
           <img src="/images/logo.png" width="75" height="75" />
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a
-                class="nav-link active text-navbar"
-                aria-current="page"
-                href="#"
-                >Create Game</a
-              >
+              <a class="nav-link active" aria-current="page" id="leave-room">
+                Buy More
+              </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active  text-navbar" href="#">Join Game</a>
+              <a class="nav-link active" aria-current="page" id="leave-room">
+                Leave Room
+              </a>
             </li>
           </ul>
         </div>
@@ -75,173 +63,43 @@
       class="container-fluid bg-table h-auto position-relative"
       style="min-height: 89.1vh;"
     >
-      <!-- OPTIONS FORM -->
+      <!-- Modal -->
       <div
-        id="create-or-join"
-        style="background-color: rgb(0,0, 0, 0.7); min-height: 89.1vh; display: flex;"
+        class="modal fade"
+        id="leave-room-modal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
       >
-        <div style="width:60%; margin: auto; align-content: center;">
-          <div class="row p-1">
-            <div class="col-5 press-form">
-              <h2 style="color: white;">Be a <br />Creator!</h2>
-              <br />
-              <button id="get-create-room" class="main-btn">Create Game</button>
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Leaving Room</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
-            <div class="col-1"></div>
-            <div class="col-5 press-form">
-              <h2 style="color:white ;">
-                Play with Friends!
-              </h2>
-              <br />
-              <button id="get-join-room" class="main-btn">
-                Join Game
+            <div class="modal-body">
+              You are currently the banker of the room. If you leave the room,
+              the room will be delted and all players will be removed from the
+              room.
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" id="remove-room" class="btn btn-warning">
+                Leave Room
               </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- CREATE ROOM FORM -->
-      <div
-        id="create-room"
-        style="background-color: rgb(0,0, 0, 0.7); min-height: 89.1vh; display: flex;"
-        hidden
-      >
-        <div
-          style="width:50%; margin: auto; align-content: center; text-align: start;"
-        >
-          <form>
-            <div>
-              <label for="name" class="form-label mb-3">Room Name</label>
-              <div
-                id="create-name-invalid"
-                class="alert alert-danger"
-                role="alert"
-                hidden
-              >
-                Invalid
-              </div>
-              <input
-                type="text"
-                id="create-name"
-                class="form-control mb-3"
-                id="name"
-                name="name"
-                required
-              />
-            </div>
-            <div>
-              <label for="password" class="form-label mb-3">Password</label>
-              <div
-                id="create-password-invalid"
-                class="alert alert-danger"
-                role="alert"
-                hidden
-              >
-                Invalid
-              </div>
-              <input
-                type="password"
-                id="create-password"
-                class="form-control mb-3"
-                name="password"
-                required
-              />
-            </div>
-            <div>
-              <label for="chips" class="form-label mb-3"
-                >Chips you want to start with:</label
-              >
-              <div
-                id="create-chips-invalid"
-                class="alert alert-danger"
-                role="alert"
-                hidden
-              ></div>
-              <input
-                type="number"
-                id="create-chips"
-                name="chips"
-                step="10"
-                min="0"
-                class="form-control mb-5"
-                required
-              />
-            </div>
-          </form>
-
-          <button id="create-room-btn" class="main-btn">Create Game</button>
-        </div>
-      </div>
-
-      <!-- JOIN ROOM FORM -->
-      <div
-        id="join-room"
-        style="background-color: rgb(0,0, 0, 0.7); min-height: 89.1vh; display: flex;"
-        hidden
-      >
-        <div style="width:50%; margin: auto; align-content: center;">
-          <form>
-            <div>
-              <label for="name" class="form-label mb-3">Room Name</label>
-              <div
-                id="join-name-invalid"
-                class="alert alert-danger"
-                role="alert"
-                hidden
-              >
-                Invalid
-              </div>
-              <input
-                type="text"
-                id="join-name"
-                class="form-control mb-3"
-                id="name"
-                name="name"
-                required
-              />
-            </div>
-            <div>
-              <label for="password" class="form-label mb-3">Password</label>
-              <div
-                id="join-password-invalid"
-                class="alert alert-danger"
-                role="alert"
-                hidden
-              >
-                Invalid
-              </div>
-              <input
-                type="password"
-                id="join-password"
-                class="form-control mb-3"
-                name="password"
-                required
-              />
-            </div>
-            <div>
-              <label for="chips" class="form-label mb-3"
-                >Chips you want to start with:</label
-              >
-              <div
-                id="join-chips-invalid"
-                class="alert alert-danger"
-                role="alert"
-                hidden
-              ></div>
-              <input
-                type="number"
-                id="join-chips"
-                name="chips"
-                step="10"
-                min="0"
-                class="form-control mb-5"
-                required
-              />
-            </div>
-          </form>
-
-          <button id="join-room-btn" class="main-btn">Join Game</button>
         </div>
       </div>
 
@@ -289,6 +147,15 @@
 
       <!-- SEATS AFTER SEATING  -->
       <div id="seats-after" hidden>
+        <div
+          class="alert alert-warning text-center"
+          id="waiting-message"
+          style="margin:auto"
+          role="alert"
+          hidden
+        >
+          Game has yet to start! EXCITING
+        </div>
         <button id="2" class="seated" style="bottom: 28%; left: 25%">
           Sit
         </button>
@@ -319,17 +186,37 @@
         <button id="11" class="seated" style=" bottom: 28%; right: 25%">
           Sit
         </button>
-        <button
-          id="main-seat"
-          class="position-absolute p-4 "
-          style="width:20%; bottom: 10%; left: 40%"
-        >
-          Main Hand
-        </button>
+        <div id="main-seat">
+          <div
+            id="main-seat-1"
+            class="position-absolute p-4 card "
+            style="width:10%;height:15%; bottom: 10%; left: 40%"
+          >
+            Main Hand
+          </div>
+          <div
+            id="main-seat-2"
+            class="position-absolute p-4 card"
+            style="width:10%; height:15%; bottom: 10%; right: 40%"
+          >
+            Main Hand
+          </div>
+          <div
+            id="points"
+            class="position-absolute"
+            style="bottom: 5%; right: 47%"
+          ></div>
+        </div>
+        <div class="position-absolute" style="bottom: 5%; right: 5%">
+          <button id="start" class="main-btn p-4">Start Game</button>
+        </div>
+
+        <!-- MAIN CONTROLS  -->
         <div
           id="controls"
           class="position-absolute"
           style="bottom: 5%; right: 5%"
+          hidden
         >
           <div id="timer" class="row text-white">
             <p class="text-end">00:00</p>
@@ -339,11 +226,12 @@
               id="take-card"
               class="main-btn p-4"
               style="margin-right: 2px"
+              disabled
             >
               Take Card
             </button>
 
-            <button id="buy-more" class="second-btn p-3">
+            <div id="chips" class="second-btn p-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -366,7 +254,9 @@
                   d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 5.982 5.982 0 0 1 3.13-1.567z"
                 />
               </svg>
-            </button>
+              <br />
+              100
+            </div>
           </div>
         </div>
       </div>
@@ -381,6 +271,6 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/helper.js"></script>
-    <script src="/script.js"></script>
+    <script src="/in-room.js"></script>
   </body>
 </html>

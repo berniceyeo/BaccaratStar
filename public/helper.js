@@ -51,6 +51,7 @@ const checkBlanks = (
 // FUNCTIONS RELATED TO SEATS
 const reshuffleSeats = (seatId) => {
   const restOfSeats = document.getElementsByClassName("seated");
+  console.log(restOfSeats);
   let currentSeat = seatId + 1;
 
   for (let i = 0; i < restOfSeats.length; i++) {
@@ -67,13 +68,21 @@ const reshuffleSeats = (seatId) => {
   banker.innerHTML = "Banker";
 };
 
-const checkForSeated = (array) => {
-  array.forEach((user) => {
-    if (user.seat_id !== 1 || user.seat_id !== null) {
-      const seatBefore = document.getElementById(`seat-${user.seat_id}`);
-      seatBefore.disabled = true;
-      seatBefore.classList.add("taken");
-      seatBefore.innerHTML = "Taken";
-    }
-  });
+//DISPLAYS CARDS
+const displayCardsPoints = (data) => {
+  let sum = 0;
+  let stringSum;
+  for (let i = 1; i < 3; i++) {
+    sum += data[i - 1].points;
+    stringSum = String(sum).slice(-1);
+    const card = document.getElementById(`main-seat-${i}`);
+    card.innerHTML = "";
+    const image = document.createElement("img");
+    card.style.backgroundImage = `url(${data[i - 1].pic})`;
+  }
+  const points = document.getElementById("points");
+  points.innerHTML = `Points: ${stringSum}`;
+  gameStartBtn.hidden = true;
+  controls.hidden = false;
+  takeCardBtn.disabled = false;
 };

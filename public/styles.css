@@ -8,6 +8,11 @@ body {
   font-size: 16px;
 }
 
+.text-gamebar {
+  color: rgb(255, 255, 255, 0.6);
+  font-size: 30px;
+}
+
 .text-color {
   color: rgb(255, 189, 89);
   font-family: Barlow, sans-serif;
@@ -31,6 +36,14 @@ body {
   width: 12%;
   position: absolute;
   padding: 25px;
+}
+
+.card {
+  border: 1px solid white;
+  background-color: transparent;
+  background-size: 100% 100%;
+  color: white;
+  text-align: center;
 }
 
 .seated {
@@ -97,12 +110,12 @@ body {
   border-radius: 10px;
 }
 
-.second-btn:hover {
+/* .second-btn:hover {
   color: white;
   background-color: rgb(214, 158, 73);
   border: 2px solid rgb(255, 189, 89);
   border-radius: 10px;
-}
+} */
 
 .center {
   margin: auto;

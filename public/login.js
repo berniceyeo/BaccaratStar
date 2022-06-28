@@ -70,7 +70,7 @@ const postLogin = () => {
           loginPasswordFeedback.innerHTML = response.data;
           toggleValidity(loginPassword, "is-invalid");
         } else {
-          window.location.replace("http://localhost:3004/game");
+          window.location.replace("http://localhost:3004/room");
         }
       });
     }

@@ -28,6 +28,8 @@ export const createDeck = () => {
         name: cardName,
         suit: suit,
         rank,
+        points,
+        pic: `/images/cards/${cardName}_of_${suit}.png`,
       };
 
       deck.push(card);

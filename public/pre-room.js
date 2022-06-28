@@ -6,11 +6,9 @@ const joinRoomBtn = document.getElementById("join-room-btn");
 
 //SECTIONS
 const mainForms = document.getElementById("create-or-join");
-const seatsBefore = document.getElementById("seats-bef");
 const mainSeat = document.getElementById("main-seat");
 const createForm = document.getElementById("create-room");
 const joinForm = document.getElementById("join-room");
-const afterseating = document.getElementById("seats-after");
 
 //ERROR MESSAGES
 const createInvalidName = document.getElementById("create-name-invalid");
@@ -75,8 +73,7 @@ const createRoom = () => {
           createInvalidName.hidden = false;
           toggleValidity(createFormName, "invalid");
         } else {
-          createForm.hidden = true;
-          afterseating.hidden = false;
+          window.location.replace("http://localhost:3004/game");
         }
       });
     }
@@ -120,10 +117,7 @@ const joinRoom = () => {
           joinInvalidPassword.hidden = false;
           toggleValidity(joinFormPassword, "invalid");
         } else {
-          console.log(response.data);
-          checkForSeated(response.data.users);
-          joinForm.hidden = true;
-          seatsBefore.hidden = false;
+          window.location.replace("http://localhost:3004/game");
         }
       });
     }
@@ -132,35 +126,8 @@ const joinRoom = () => {
   }
 };
 
-const allSeats = document.getElementsByClassName("seats");
-
-const socket = io("http://localhost:3004");
-
-Array.from(allSeats).forEach((btn) => {
-  btn.addEventListener("click", function assignSeat(event) {
-    const seatId = Number(this.id.slice(5));
-    try {
-      const data = {
-        seatId,
-      };
-      axios.put("/game/seat", data).then((response) => {
-        if (response.data === "seated") {
-          afterseating.hidden = false;
-          seatsBefore.hidden = true;
-          reshuffleSeats(seatId);
-          socket.emit("seat", data);
-        }
-      });
-    } catch (error) {}
-  });
-});
-
+// BUTTONS EVENTS
 createRoomBtn.addEventListener("click", createRoom);
 joinRoomBtn.addEventListener("click", joinRoom);
 showCreateRoomBtn.addEventListener("click", showCreateForm);
 showJoinRoomBtn.addEventListener("click", showJoinForm);
-
-socket.on("seated", (data) => {
-  const occupiedSeat = document.getElementById(data.seatId);
-  occupiedSeat.classList.add("taken");
-});

@@ -43,6 +43,11 @@ io.on("connection", (socket) => {
     console.log("in the room", data);
     socket.broadcast.emit("seated", data);
   });
+
+  socket.on("start-game", () => {
+    console.log("game has started");
+    socket.broadcast.emit("started");
+  });
 });
 
 http.listen(PORT, () => {
