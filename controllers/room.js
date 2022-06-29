@@ -18,6 +18,7 @@ class RoomController {
     try {
       const { userId } = req;
       const user = await this.db.User.findByPk(userId);
+      console.log(user);
       const userDetails = user.toJSON();
       res.send(userDetails);
     } catch (error) {

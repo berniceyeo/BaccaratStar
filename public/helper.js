@@ -51,7 +51,6 @@ const checkBlanks = (
 // FUNCTIONS RELATED TO SEATS
 const reshuffleSeats = (seatId) => {
   const restOfSeats = document.getElementsByClassName("seated");
-  console.log(restOfSeats);
   let currentSeat = seatId + 1;
 
   for (let i = 0; i < restOfSeats.length; i++) {
@@ -72,13 +71,14 @@ const reshuffleSeats = (seatId) => {
 const displayCardsPoints = (data) => {
   let sum = 0;
   let stringSum;
+  const mainBox = document.getElementById("main-seat");
   for (let i = 1; i < 3; i++) {
     sum += data[i - 1].points;
     stringSum = String(sum).slice(-1);
-    const card = document.getElementById(`main-seat-${i}`);
+    const card = document.getElementById(`mainseat-${i}`);
     card.innerHTML = "";
-    const image = document.createElement("img");
     card.style.backgroundImage = `url(${data[i - 1].pic})`;
+    card.hidden = false;
   }
   const points = document.getElementById("points");
   points.innerHTML = `Points: ${stringSum}`;

@@ -35,16 +35,25 @@ const init = async () => {
     const response = await axios.get("/game/userstate");
     const seatId = response.data.seat_id;
     console.log(seatId);
-    if (seatId === null) {
+    if (seatId === null || seatId === undefined) {
       seatsBefore.hidden = false;
     } else {
       if (seatId !== 1) {
         controls.hidden = false;
         gameStartBtn.hidden = true;
-        waitingMessage.hidden = false;
         reshuffleSeats(seatId);
+        waitingMessage.hidden = false;
       }
       afterseating.hidden = false;
+      //to check if the game has started
+      const res = await axios.get("/game/gamestate");
+      const userId = res.data.userId;
+      const gameState = res.data.game.game_state;
+      if (gameState !== null) {
+        const userGameState = gameState[userId];
+        displayCardsPoints(userGameState);
+        waitingMessage.hidden = true;
+      }
     }
   } catch (error) {
     console.log(error);
@@ -79,11 +88,20 @@ const removeRoom = () => {
 const gameStart = async () => {
   try {
     const gameState = await axios.post("/game/start");
+    console.log(gameState);
+    if (gameState.data === "no other players") {
+      throw new Error(gameState.data);
+    }
     const data = gameState.data;
     displayCardsPoints(data);
     socket.emit("start-game");
   } catch (error) {
     console.log(error);
+    if (error.message === "no other players") {
+      alert(
+        "There are no other players in the game. Please wait till there are other players"
+      );
+    }
   }
 };
 
