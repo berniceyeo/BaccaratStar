@@ -18,7 +18,6 @@ class RoomController {
     try {
       const { userId } = req;
       const user = await this.db.User.findByPk(userId);
-      console.log(user);
       const userDetails = user.toJSON();
       res.send(userDetails);
     } catch (error) {
@@ -30,7 +29,7 @@ class RoomController {
   createRoom = async (req, res) => {
     const transaction = await this.db.sequelize.transaction();
     try {
-      const { name, password, chips } = req.body;
+      const { name, password, chips, bet } = req.body;
       const { userId } = req;
       const hashedPassword = getHash(password);
       const newRoom = await this.db.Room.create(
@@ -85,7 +84,7 @@ class RoomController {
 
   joinRoom = async (req, res) => {
     try {
-      const { name, password, chips } = req.body;
+      const { name, password, chips, bet } = req.body;
       const { userId } = req;
 
       const findRoom = await this.db.Room.findOne({
@@ -114,6 +113,7 @@ class RoomController {
         {
           room_id: Number(roomId),
           banker: false,
+          bet: Number(bet),
           chips_bought: Number(chips),
           chips: Number(chips),
           updatedAt: Date.now(),
@@ -237,7 +237,6 @@ class RoomController {
             transaction,
           }
         );
-        console.log(i);
       }
 
       await game.destroy({

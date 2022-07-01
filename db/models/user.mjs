@@ -27,7 +27,10 @@ export default function initUserModel(sequelize, DataTypes) {
       chips_bought: {
         type: DataTypes.INTEGER,
       },
-      chips_: {
+      chips: {
+        type: DataTypes.INTEGER,
+      },
+      bet: {
         type: DataTypes.INTEGER,
       },
       banker: {

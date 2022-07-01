@@ -53,7 +53,10 @@ module.exports = {
       chips_bought: {
         type: Sequelize.INTEGER,
       },
-      chips_: {
+      chips: {
+        type: Sequelize.INTEGER,
+      },
+      bet: {
         type: Sequelize.INTEGER,
       },
       banker: {

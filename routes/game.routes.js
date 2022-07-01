@@ -11,15 +11,26 @@ const gameController = new GameController(db);
 
 router.post("/game/create", authenticate, roomController.createRoom);
 router.post("/game/join", authenticate, roomController.joinRoom);
+
 router.post("/game/start", authenticate, checkGame, gameController.gameStart);
+//get the status of the game that is going on (i.e. cards and deck)
 router.get(
   "/game/gamestate",
   authenticate,
   checkGame,
   gameController.gameState
 );
+//get the status of the user (i.e. the user's seat and the person's room)
 router.get("/game/userstate", authenticate, roomController.checkRoomSeat);
+router.put(
+  "/game/turn-change",
+  authenticate,
+  checkGame,
+  gameController.changeTurn
+);
 router.put("/game/seat", authenticate, checkGame, roomController.sitDown);
+router.put("/game/end", authenticate, checkGame, gameController.endGame);
+
 router.put("/game/leave", authenticate, checkGame, roomController.leaveRoom);
 router.delete(
   "/game/delete",

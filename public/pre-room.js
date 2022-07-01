@@ -16,17 +16,21 @@ const createInvalidPassword = document.getElementById(
   "create-password-invalid"
 );
 const createInvalidChips = document.getElementById("create-chips-invalid");
+const createInvalidBet = document.getElementById("create-bet-invalid");
 const joinInvalidName = document.getElementById("join-name-invalid");
 const joinInvalidPassword = document.getElementById("join-password-invalid");
 const joinInvalidChips = document.getElementById("join-chips-invalid");
+const joinInvalidBet = document.getElementById("join-bet-invalid");
 
 //FORM ELEMENTS
 const createFormName = document.getElementById("create-name");
 const createFormPassword = document.getElementById("create-password");
 const createFormChips = document.getElementById("create-chips");
+const createFormBet = document.getElementById("create-bet");
 const joinFormName = document.getElementById("join-name");
 const joinFormPassword = document.getElementById("join-password");
 const joinFormChips = document.getElementById("join-chips");
+const joinFormBet = document.getElementById("join-bet");
 
 //AJAX FUNCTIONS
 const showCreateForm = () => {
@@ -51,15 +55,13 @@ const createRoom = () => {
       chips,
     };
 
-    console.log(data);
-
     checkBlanks(
       name,
       password,
       chips,
       createInvalidName,
       createFormName,
-      joinInvalidPassword,
+      createInvalidPassword,
       createFormPassword,
       createInvalidChips,
       createFormChips
@@ -87,10 +89,12 @@ const joinRoom = () => {
     const name = joinFormName.value;
     const password = joinFormPassword.value;
     const chips = joinFormChips.value;
+    const bet = joinFormBet.value;
     const data = {
       name,
       password,
       chips,
+      bet,
     };
 
     checkBlanks(
@@ -105,7 +109,16 @@ const joinRoom = () => {
       joinFormChips
     );
 
-    if (name !== "" && password !== "" && chips !== "") {
+    if (bet === "") {
+      joinInvalidBet.innerHTML = "Please input the bet you want";
+      joinInvalidBet.hidden = false;
+      toggleValidity(joinFormBet, "invalid");
+    } else {
+      joinInvalidBet.hidden = true;
+      toggleValidity(joinFormBet, "valid");
+    }
+
+    if (name !== "" && password !== "" && chips !== "" && bet !== "") {
       axios.post("/game/join", data).then((response) => {
         if (response.data.message === "No such room exists") {
           joinInvalidName.innerHTML =

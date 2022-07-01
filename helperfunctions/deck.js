@@ -1,5 +1,5 @@
 const getRandomIndex = (num) => {
-  return Math.floor(Math.random() * (num + 1));
+  return Math.floor(Math.random() * num);
 };
 
 export const createDeck = () => {
@@ -7,7 +7,7 @@ export const createDeck = () => {
   const suits = ["hearts", "diamonds", "spades", "clubs"];
 
   suits.forEach((suit) => {
-    for (let rank = 0; rank <= 13; rank++) {
+    for (let rank = 1; rank <= 13; rank++) {
       let cardName = rank;
       let points = rank;
 
@@ -42,6 +42,7 @@ export const createDeck = () => {
 export const shuffleDeck = (deck) => {
   for (let currentIndex = 0; currentIndex < deck.length; currentIndex++) {
     const randomIndex = getRandomIndex(deck.length);
+
     const currentItem = deck[currentIndex];
     const randomItem = deck[randomIndex];
 

@@ -71,7 +71,7 @@ const reshuffleSeats = (seatId) => {
 const displayCardsPoints = (data) => {
   let sum = 0;
   let stringSum;
-  const mainBox = document.getElementById("main-seat");
+  // const mainBox = document.getElementById("main-seat");
   for (let i = 1; i < 3; i++) {
     sum += data[i - 1].points;
     stringSum = String(sum).slice(-1);
@@ -81,8 +81,31 @@ const displayCardsPoints = (data) => {
     card.hidden = false;
   }
   const points = document.getElementById("points");
-  points.innerHTML = `Points: ${stringSum}`;
+  points.innerHTML = `${stringSum}`;
   gameStartBtn.hidden = true;
   controls.hidden = false;
-  takeCardBtn.disabled = false;
+  // takeCardBtn.disabled = false;
+};
+
+const highlightingSeat = (turn, seatId) => {
+  console.log(turn, seatId);
+  if (turn === seatId) {
+    const turnSeat = document.getElementById("mainseat-back");
+    turnSeat.classList.add("turn");
+    takeCardBtn.disabled = false;
+  } else {
+    const turnSeat = document.getElementById(`${turn}`);
+    turnSeat.classList.add("turn");
+    takeCardBtn.disabled = true;
+  }
+};
+
+const removeHighlighting = (turn, seatId) => {
+  if (turn === seatId) {
+    const turnSeat = document.getElementById("mainseat-back");
+    turnSeat.classList.remove("turn");
+  } else {
+    const turnSeat = document.getElementById(`${turn}`);
+    turnSeat.classList.remove("turn");
+  }
 };

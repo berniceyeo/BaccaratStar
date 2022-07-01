@@ -153,8 +153,8 @@
                 id="create-chips"
                 name="chips"
                 step="10"
-                min="0"
-                class="form-control mb-5"
+                min="1"
+                class="form-control mb-3"
                 required
               />
             </div>
@@ -226,6 +226,24 @@
                 name="chips"
                 step="10"
                 min="0"
+                class="form-control mb-3"
+                required
+              />
+            </div>
+            <div>
+              <label for="bet" class="form-label mb-3">Bet per Game:</label>
+              <div
+                id="join-bet-invalid"
+                class="alert alert-danger"
+                role="alert"
+                hidden
+              ></div>
+              <input
+                type="number"
+                id="join-bet"
+                name="bet"
+                step="10"
+                min="1"
                 class="form-control mb-5"
                 required
               />

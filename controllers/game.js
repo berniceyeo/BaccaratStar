@@ -1,4 +1,5 @@
 import { createDeck, shuffleDeck } from "../helperfunctions/deck.js";
+import { generateWinStatus } from "../helperfunctions/checkwin.js";
 import { Op } from "sequelize";
 
 class GameController {
@@ -12,6 +13,10 @@ class GameController {
       const userId = req.userId;
       const roomId = req.roomId;
 
+      //get the seatId of the user
+      const user = await this.db.User.findByPk(userId);
+      const seatId = user.seat_id;
+
       //get all users from game and the game details
       const getGame = await this.db.Room.findOne({
         where: {
@@ -21,32 +26,99 @@ class GameController {
           model: this.db.User,
         },
       });
-
       const users = getGame.users;
+
+      //sorting the users based on their seat to see who starts first
+      const sortedUsers = users.sort((a, b) => {
+        return a.seat_id - b.seat_id;
+      });
 
       //if there isnt any other users
       if (users.length < 2) {
         throw new Error("no other players");
       }
 
+      const currentTurn = sortedUsers[1].seat_id;
+
       // creating the game state json variable
       const gameState = {
-        turn: 2,
+        turn: currentTurn,
       };
 
-      //for each player in the game, deal 2 cards
+      //for each player in the game, deal 2 cards.
       for (let i = 0; i < users.length; i++) {
         const playerHand = [cardDeck.pop(), cardDeck.pop()];
-        const id = users[i].id;
-        gameState[id] = playerHand;
+        const seat = users[i].seat_id;
+        gameState[seat] = playerHand;
       }
 
-      getGame.update({
+      gameState["deck"] = cardDeck;
+
+      await getGame.update({
         game_state: gameState,
       });
 
+      const data = {
+        seatId,
+        game: getGame,
+      };
+
       //send the new game state
-      res.send(gameState[userId]);
+      res.send(data);
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
+  changeTurn = async (req, res) => {
+    try {
+      const roomId = req.roomId;
+
+      //get all users from game and the game details as we would need to pass the turn to the next user
+      const getGame = await this.db.Room.findOne({
+        where: {
+          id: roomId,
+        },
+        include: {
+          model: this.db.User,
+        },
+      });
+
+      //if there isnt any other users
+      if (getGame.game_state === null || getGame.game_state === undefined) {
+        throw new Error("the game has not start");
+      }
+
+      //increase the turn by 1
+      const users = getGame.users;
+      const gameState = { ...getGame.game_state };
+      const currentTurn = gameState.turn;
+      const index = users.indexOf(currentTurn);
+      let newTurn;
+
+      //if there is no next player, then return to banker
+      if (currentTurn === users.length) {
+        newTurn = 1;
+      } else {
+        newTurn = users[index + 1].seat_id;
+      }
+
+      gameState.turn = newTurn;
+
+      await this.db.Room.update(
+        {
+          game_state: gameState,
+        },
+        {
+          where: {
+            id: roomId,
+          },
+        }
+      );
+
+      //send the new game state
+      res.send({ turn: newTurn });
     } catch (error) {
       console.log(error);
       res.send(error.message);
@@ -55,21 +127,97 @@ class GameController {
 
   gameState = async (req, res) => {
     try {
-      const cardDeck = shuffleDeck(createDeck());
       const userId = req.userId;
       const roomId = req.roomId;
 
+      const user = await this.db.User.findByPk(userId);
+      const seatId = user.seat_id;
+      const getGame = await this.db.Room.findOne({
+        where: {
+          id: roomId,
+        },
+        include: {
+          model: this.db.User,
+        },
+      });
+
+      const data = {
+        seatId,
+        game: getGame,
+      };
+
+      res.send(data);
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
+  endGame = async (req, res) => {
+    const transaction = await this.db.sequelize.transaction();
+    try {
+      const userId = req.userId;
       //get the user
       const user = await this.db.User.findByPk(userId);
+      let bankerChips = Number(user.chips);
+      console.log("banker", bankerChips);
+      const seatId = user.seat_id;
       const game = await user.getRoom();
+      //generate win status
+      const winStatus = generateWinStatus(game.game_state);
+      //clear the game
+      await game.update({
+        game_state: null,
+      });
+
+      for (const [key, value] of Object.entries(winStatus)) {
+        const playerSeat = key;
+        //to get the player
+        const player = await this.db.User.findOne({
+          where: {
+            seat_id: playerSeat,
+          },
+        });
+        let playerBet = Number(player.bet);
+        let playerChips = Number(player.chips);
+        console.log("player", playerBet, playerChips);
+        if (value === "Win") {
+          bankerChips = bankerChips - playerBet;
+          playerChips = playerChips + playerBet;
+        } else if (value === "Lose") {
+          bankerChips = bankerChips + playerBet;
+          playerChips = playerChips - playerBet;
+        }
+        console.log("player", playerBet, playerChips);
+        console.log("banker", bankerChips);
+
+        await player.update(
+          {
+            chips: playerChips,
+          },
+          {
+            transaction,
+          }
+        );
+      }
+
+      await user.update(
+        {
+          chips: bankerChips,
+        },
+        { transaction }
+      );
+
       const data = {
-        userId,
-        game,
+        seatId,
+        winStatus,
       };
+      await transaction.commit();
       //send the new game state
       res.send(data);
     } catch (error) {
       console.log(error);
+      await transaction.rollback();
       res.send(error.message);
     }
   };

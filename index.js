@@ -44,9 +44,18 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("seated", data);
   });
 
-  socket.on("start-game", () => {
-    console.log("game has started");
-    socket.broadcast.emit("started");
+  socket.on("start-game", (data) => {
+    console.log("game has started", data);
+    socket.broadcast.emit("started", data);
+  });
+
+  socket.on("change-turn", (data) => {
+    console.log("change turn", data);
+    socket.broadcast.emit("changed-turn", data);
+  });
+  socket.on("end-game", (data) => {
+    console.log("ended", data);
+    socket.broadcast.emit("ended", data);
   });
 });
 
