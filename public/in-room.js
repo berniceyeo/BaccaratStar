@@ -4,23 +4,23 @@ const leaveRoomBtn = document.getElementById("leave-room");
 const removeRoomBtn = document.getElementById("remove-room");
 const takeCardBtn = document.getElementById("take-card");
 const buyMoreBtn = document.getElementById("buy-chips-btn");
-
+const showChangeBetBtn = document.getElementById("show-change-bet");
+const changeBetBtn = document.getElementById("change-bet-btn");
 //SEATS SECTIONS
 const seatsBefore = document.getElementById("seats-bef");
 const mainSeat = document.getElementById("main-seat");
 const afterseating = document.getElementById("seats-after");
 const allSeats = document.getElementsByClassName("seats");
-
 //CHIPS AND POINTS SECTIONS
 const points = document.getElementById("points");
 const pointsDiv = document.getElementById("points-div");
 const betSection = document.getElementById("bet");
 const chipsSection = document.getElementById("chips");
 const betDiv = document.getElementById("bet-div");
-
 // BUY MORE CHIPS FORM
 const additionalChips = document.getElementById("buychips");
-
+// CHANGE BET FORM
+const changeBetValue = document.getElementById("changebet");
 //OTHER SECTIONS
 const controls = document.getElementById("controls");
 const waitingMessage = document.getElementById("waiting-message");
@@ -106,6 +106,7 @@ const init = async () => {
         reshuffleSeats(seatId);
         waitingMessage.hidden = false;
       } else {
+        showChangeBetBtn.hidden = true;
         betDiv.hidden = true;
         pointsDiv.style.left = "48%";
       }
@@ -210,6 +211,15 @@ const buyMoreChips = async () => {
   }, 2000);
 };
 
+const changeBet = async () => {
+  const data = {
+    bet: changeBetValue.value,
+  };
+  const response = await axios.put("game/change-bet", data);
+  $("#change-bet-modal").modal("hide");
+  betSection.innerHTML = response.data.newbet;
+};
+
 //to end the game: only for banker side
 const endGame = async () => {
   const response = await axios.put("game/end");
@@ -265,6 +275,7 @@ leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
 takeCardBtn.addEventListener("click", takeCard);
 buyMoreBtn.addEventListener("click", buyMoreChips);
+changeBetBtn.addEventListener("click", changeBet);
 init();
 
 //When the person joins the room, they can click which seat they want to sit in

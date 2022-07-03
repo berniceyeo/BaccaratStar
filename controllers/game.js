@@ -188,6 +188,24 @@ class GameController {
     }
   };
 
+  changeBet = async (req, res) => {
+    try {
+      const userId = req.userId;
+      const roomId = req.roomId;
+      const newBet = req.body.bet;
+
+      const user = await this.db.User.findByPk(userId);
+      await user.update({
+        bet: Number(newBet),
+      });
+
+      res.send({ newbet: newBet });
+    } catch (error) {
+      console.log(error);
+      res.send(error);
+    }
+  };
+
   gameState = async (req, res) => {
     try {
       const userId = req.userId;

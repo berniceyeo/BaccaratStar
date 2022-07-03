@@ -44,9 +44,17 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" id="bet-change">
+              <!-- show modal of form to change bet -->
+              <button
+                type="button"
+                id="show-change-bet"
+                class="btn nav-link active"
+                data-bs-toggle="modal"
+                data-bs-target="#change-bet-modal"
+                aria-current="page"
+              >
                 Change Bet
-              </a>
+              </button>
             </li>
             <li class="nav-item">
               <!-- show modal of form to buy more chips -->
@@ -77,7 +85,71 @@
       class="container-fluid bg-table h-auto position-relative"
       style="min-height: 89.1vh;"
     >
-      <!-- Buy More Modal -->
+      <!-- CHANGE BET -->
+      <div
+        class="modal fade"
+        id="change-bet-modal"
+        tabindex="-1"
+        aria-labelledby="change-bet-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="change-bet-modalLabel">
+                Change your Bet
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div>
+                  <label for="changebet" class="form-label mb-3"
+                    >New Bet
+                  </label>
+                  <div
+                    id="changebet-invalid"
+                    class="alert alert-danger"
+                    role="alert"
+                    hidden
+                  >
+                    Invalid
+                  </div>
+                  <input
+                    type="number"
+                    id="changebet"
+                    class="form-control mb-3"
+                    id="name"
+                    name="changebet"
+                    step="10"
+                    min="1"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" id="change-bet-btn" class="btn btn-warning">
+                Change Bet
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUY MORE -->
       <div
         class="modal fade"
         id="buy-more-modal"
