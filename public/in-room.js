@@ -57,6 +57,9 @@ socket.on("ended", async (winStatus) => {
   document.getElementById("results-modal-btn").click();
   removeHighlighting(1, seatId);
   points.innerHTML = "";
+  document.getElementById("mainseat-1").backgroundImage = "none";
+  document.getElementById("mainseat-2").backgroundImage = "none";
+  document.getElementById("mainseat-3").backgroundImage = "none";
   const hide = setTimeout(hideModal, 1000);
 });
 
@@ -208,6 +211,9 @@ const endGame = async () => {
     seat.hidden = true;
   }
   points.innerHTML = "";
+  document.getElementById("mainseat-1").backgroundImage = "none";
+  document.getElementById("mainseat-2").backgroundImage = "none";
+  document.getElementById("mainseat-3").backgroundImage = "none";
   const hide = setTimeout(hideModal, 1000);
   const start = setTimeout(gameStart, 2500);
 };
