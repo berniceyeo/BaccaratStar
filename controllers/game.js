@@ -88,8 +88,6 @@ class GameController {
   changeTurn = async (req, res) => {
     try {
       const roomId = req.roomId;
-      console.log("change turn", req.cookies);
-      //get all users from game and the game details as we would need to pass the turn to the next user
       const getGame = await this.db.Room.findOne({
         where: {
           id: roomId,
@@ -134,7 +132,7 @@ class GameController {
       });
 
       //send the new game state
-      res.send({ turn: newTurn });
+      res.send({ turn: newTurn, room: roomId });
     } catch (error) {
       console.log(error);
       res.send(error.message);
@@ -206,7 +204,7 @@ class GameController {
     try {
       const userId = req.userId;
       const newBet = req.body.bet;
-      console.log("newbet", newBet);
+
       await this.db.User.update(
         {
           bet: newBet,
@@ -258,11 +256,13 @@ class GameController {
     try {
       console.log(req.cookies);
       const userId = req.userId;
+      const roomId = req.roomId;
       //get the user
       const user = await this.db.User.findByPk(userId);
       let bankerChips = Number(user.chips);
       console.log("banker", bankerChips);
       const seatId = user.seat_id;
+
       const game = await user.getRoom();
       //generate win status
       const winStatus = generateWinStatus(game.game_state);
@@ -311,6 +311,7 @@ class GameController {
 
       const data = {
         seatId,
+        room: roomId,
         winStatus,
       };
       await transaction.commit();

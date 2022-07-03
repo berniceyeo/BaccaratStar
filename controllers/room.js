@@ -159,7 +159,7 @@ class RoomController {
       const { seatId } = req.body;
       const { userId } = req;
 
-      const updateUser = await this.db.User.update(
+      const [num, updateUser] = await this.db.User.update(
         {
           seat_id: Number(seatId),
         },
@@ -167,10 +167,12 @@ class RoomController {
           where: {
             id: userId,
           },
+          returning: true,
         }
       );
+      console.log(updateUser[0]);
 
-      res.send("seated");
+      res.send({ success: "yes", user: updateUser[0] });
     } catch (error) {
       console.log(error);
       res.send(error.message);

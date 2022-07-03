@@ -38,23 +38,38 @@ app.use("/", gameRouter);
 io.on("connection", (socket) => {
   console.log("a user has logged in");
 
+  socket.on("join-room", async (data) => {
+    //user joining the room
+    console.log(`a user has joined room ${data}`);
+    socket.join(data);
+  });
+
   socket.on("seat", async (data) => {
     console.log("in the room", data);
-    socket.broadcast.emit("seated", data);
+    const room = data[0];
+    const seatId = data[1];
+    socket.to(room).emit("seated", seatId);
   });
 
   socket.on("start-game", (data) => {
     console.log("game has started", data);
-    socket.broadcast.emit("started", data);
+    const room = data[0];
+    const turn = data[1];
+    socket.to(room).emit("started", turn);
   });
 
   socket.on("change-turn", (data) => {
     console.log("change turn", data);
-    socket.broadcast.emit("changed-turn", data);
+    const room = data[0];
+    const turnInfo = data[1];
+    socket.to(room).emit("changed-turn", { ...turnInfo });
   });
+
   socket.on("end-game", (data) => {
     console.log("ended", data);
-    socket.broadcast.emit("ended", data);
+    const room = data[0];
+    const winStatus = data[1];
+    socket.broadcast.emit("ended", winStatus);
   });
 });
 

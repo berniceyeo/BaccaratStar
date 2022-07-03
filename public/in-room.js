@@ -57,8 +57,8 @@ socket.on("started", async (turn) => {
 socket.on("changed-turn", async (data) => {
   const newTurn = data.newTurn;
   const oldTurn = data.oldTurn;
-  const seatId = data.oldTurn;
-
+  const response = await axios.get("/game/userstate");
+  const seatId = response.data.seat_id;
   //if now its users turn
   removeHighlighting(oldTurn, seatId);
   highlightingSeat(newTurn, seatId);
@@ -80,16 +80,6 @@ socket.on("ended", async (winStatus) => {
   const hide = setTimeout(hideModal, 1000);
 });
 
-socket.on("changed-turn", async (data) => {
-  const newTurn = data.newTurn;
-  const oldTurn = data.oldTurn;
-  const seatId = data.oldTurn;
-
-  //if now its users turn
-  removeHighlighting(oldTurn, seatId);
-  highlightingSeat(newTurn, seatId);
-});
-
 //checks the current status of the users' game so that when they refresh, they do not lose the status of their game
 const hideModal = () => {
   $("#results-modal").modal("hide");
@@ -98,6 +88,10 @@ const hideModal = () => {
 const init = async () => {
   try {
     const response = await axios.get("/game/userstate");
+    const room = response.data.room_id;
+    socket.emit("join-room", room);
+    console.log(`user is attempting to join ${room}`);
+
     const seatId = response.data.seat_id;
     const bet = response.data.bet;
     const chips = response.data.chips;
@@ -174,6 +168,7 @@ const gameStart = async () => {
   try {
     const response = await axios.post("/game/start");
     const userResponse = await axios.get("/game/userstate");
+    const room = userResponse.data.room_id;
     const chips = userResponse.data.chips;
     chipsSection.innerHTML = chips;
 
@@ -183,11 +178,14 @@ const gameStart = async () => {
     }
 
     const seatId = response.data.seatId;
+    console.log(seatId);
     const turn = response.data.game.game_state.turn;
     const userGameState = response.data.game.game_state[seatId];
     displayCardsPoints(userGameState);
     highlightingSeat(turn, seatId);
-    socket.emit("start-game", turn);
+    console.log(room);
+    socket.emit("start-game", [room, turn]);
+    console.log(turn, seatId);
     changeTurns(turn, seatId);
   } catch (error) {
     console.log(error);
@@ -234,8 +232,10 @@ const changeBet = async () => {
 const endGame = async () => {
   const response = await axios.put("game/end");
   const seatId = response.data.seatId;
+  const room = response.data.room;
   const winStatus = response.data.winStatus;
-  socket.emit("end-game", winStatus);
+  console.log(room);
+  socket.emit("end-game", [room, winStatus]);
   console.log(winStatus);
   //if the user is not banker, they will show the win/lose
   let innerContent = "";
@@ -266,7 +266,8 @@ const changeTurns = async (oldTurn, seatId) => {
   const change = async () => {
     const response = await axios.put("game/turn-change");
     const newTurn = response.data.turn;
-    socket.emit("change-turn", { newTurn, oldTurn, seatId });
+    const room = response.data.room;
+    socket.emit("change-turn", [room, { newTurn, oldTurn }]);
     removeHighlighting(oldTurn, seatId);
     highlightingSeat(newTurn, seatId);
 
@@ -279,7 +280,9 @@ const changeTurns = async (oldTurn, seatId) => {
   const startCountdown = setInterval(change, 20000);
 };
 
+// ------------------------------------
 // BUTTONS EVENTS
+// ------------------------------------
 gameStartBtn.addEventListener("click", gameStart);
 leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
@@ -306,14 +309,17 @@ Array.from(allSeats).forEach((btn) => {
 
         //update the user's seat
         axios.put("/game/seat", data).then((response) => {
-          if (response.data === "seated") {
+          console.log(response.data);
+          if (response.data.success === "yes") {
+            const room = response.data.user.roomId;
             afterseating.hidden = false;
             seatsBefore.hidden = true;
             controls.hidden = false;
             gameStartBtn.hidden = true;
             waitingMessage.hidden = false;
             reshuffleSeats(seatId);
-            socket.emit("seat", data);
+            console.log(room);
+            socket.emit("seat", [room, data]);
           }
         });
       } catch (error) {}
