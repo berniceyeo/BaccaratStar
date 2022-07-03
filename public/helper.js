@@ -99,7 +99,6 @@ const displayCardsPoints = (data) => {
 };
 
 const highlightingSeat = (turn, seatId) => {
-  console.log(turn, seatId);
   if (turn === seatId) {
     const turnSeat = document.getElementById("mainseat-back");
     turnSeat.classList.add("turn");
@@ -112,7 +111,6 @@ const highlightingSeat = (turn, seatId) => {
 };
 
 const removeHighlighting = (turn, seatId) => {
-  console.log(turn, seatId);
   if (turn === seatId) {
     const turnSeat = document.getElementById("mainseat-back");
     turnSeat.classList.remove("turn");

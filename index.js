@@ -38,12 +38,13 @@ app.use("/", gameRouter);
 io.on("connection", (socket) => {
   console.log("a user has logged in");
 
+  //data is the room_id of the user
   socket.on("join-room", async (data) => {
-    //user joining the room
     console.log(`a user has joined room ${data}`);
     socket.join(data);
   });
 
+  //returns the seat_id of the user
   socket.on("seat", async (data) => {
     console.log("in the room", data);
     const room = data[0];
@@ -51,6 +52,7 @@ io.on("connection", (socket) => {
     socket.to(room).emit("seated", seatId);
   });
 
+  //returns what turn it is now as well as the message to start the game
   socket.on("start-game", (data) => {
     console.log("game has started", data);
     const room = data[0];
@@ -58,6 +60,7 @@ io.on("connection", (socket) => {
     socket.to(room).emit("started", turn);
   });
 
+  // returns the new turn and old turn to the users, to present to the front end
   socket.on("change-turn", (data) => {
     console.log("change turn", data);
     const room = data[0];
@@ -65,11 +68,12 @@ io.on("connection", (socket) => {
     socket.to(room).emit("changed-turn", { ...turnInfo });
   });
 
+  // to display the results of the game
   socket.on("end-game", (data) => {
     console.log("ended", data);
     const room = data[0];
     const winStatus = data[1];
-    socket.broadcast.emit("ended", winStatus);
+    socket.to(room).emit("ended", winStatus);
   });
 });
 
