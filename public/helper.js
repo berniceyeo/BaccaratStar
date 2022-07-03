@@ -69,22 +69,33 @@ const reshuffleSeats = (seatId) => {
 
 //DISPLAYS CARDS
 const displayCardsPoints = (data) => {
+  console.log("cards", data);
   let sum = 0;
   let stringSum;
-  // const mainBox = document.getElementById("main-seat");
-  for (let i = 1; i < 3; i++) {
-    sum += data[i - 1].points;
+
+  for (let i = 0; i < data.length; i++) {
+    sum += data[i].points;
     stringSum = String(sum).slice(-1);
-    const card = document.getElementById(`mainseat-${i}`);
+    const card = document.getElementById(`mainseat-${i + 1}`);
     card.innerHTML = "";
-    card.style.backgroundImage = `url(${data[i - 1].pic})`;
+    card.style.backgroundImage = `url(${data[i].pic})`;
     card.hidden = false;
   }
+  if (data.length === 3) {
+    document.getElementById("mainseat-1").style.left = "43%";
+    document.getElementById("mainseat-2").style.left = "46%";
+    document.getElementById("mainseat-3").hidden = false;
+  } else if (data.length === 2) {
+    document.getElementById("mainseat-1").style.left = "44%";
+    document.getElementById("mainseat-2").style.left = "48%";
+    document.getElementById("mainseat-3").hidden = true;
+    document.getElementById("mainseat-3").backgroundImage = "none";
+  }
+
   const points = document.getElementById("points");
   points.innerHTML = `${stringSum}`;
   gameStartBtn.hidden = true;
   controls.hidden = false;
-  // takeCardBtn.disabled = false;
 };
 
 const highlightingSeat = (turn, seatId) => {

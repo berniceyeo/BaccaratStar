@@ -13,6 +13,7 @@ const controls = document.getElementById("controls");
 const waitingMessage = document.getElementById("waiting-message");
 const resultsModalBody = document.getElementById("results");
 const points = document.getElementById("points");
+const pointsDiv = document.getElementById("points-div");
 const betSection = document.getElementById("bet");
 const chipsSection = document.getElementById("chips");
 const betDiv = document.getElementById("bet-div");
@@ -95,7 +96,7 @@ const init = async () => {
         waitingMessage.hidden = false;
       } else {
         betDiv.hidden = true;
-        betDiv.style.left = "48%";
+        pointsDiv.style.left = "48%";
       }
 
       // if the person sat down, apply to all inclu banker
@@ -154,25 +155,33 @@ const gameStart = async () => {
     const userResponse = await axios.get("/game/userstate");
     const chips = userResponse.data.chips;
     chipsSection.innerHTML = chips;
+
+    console.log(response);
+    if (response.data === "no other players") {
+      throw new Error("no other players");
+    }
+
     const seatId = response.data.seatId;
     const turn = response.data.game.game_state.turn;
     const userGameState = response.data.game.game_state[seatId];
-
-    if (response.data.game === "no other players") {
-      throw new Error(response.data.game);
-    }
-
     displayCardsPoints(userGameState);
     highlightingSeat(turn, seatId);
     socket.emit("start-game", turn);
     changeTurns(turn, seatId);
   } catch (error) {
+    console.log(error);
     if (error.message === "no other players") {
       alert(
         "There are no other players in the game. Please wait till there are other players"
       );
     }
   }
+};
+
+const takeCard = async () => {
+  const response = await axios.put("game/take-card");
+  displayCardsPoints(response.data);
+  takeCardBtn.disabled = true;
 };
 
 //to end the game: only for banker side
@@ -185,7 +194,11 @@ const endGame = async () => {
   //if the user is not banker, they will show the win/lose
   let innerContent = "";
   for (const [key, value] of Object.entries(winStatus)) {
-    innerContent += `Seat ${key} : ${value} <br>`;
+    if (value === "Win") {
+      innerContent += `Seat ${key} : Lose <br>`;
+    } else if (value === "Lose") {
+      innerContent += `Seat ${key} : Win <br>`;
+    }
   }
   resultsModalBody.innerHTML = innerContent;
   document.getElementById("results-modal-btn").click();
@@ -221,6 +234,7 @@ const changeTurns = async (oldTurn, seatId) => {
 gameStartBtn.addEventListener("click", gameStart);
 leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
+takeCardBtn.addEventListener("click", takeCard);
 init();
 
 //When the person joins the room, they can click which seat they want to sit in

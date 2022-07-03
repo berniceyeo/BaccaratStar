@@ -94,17 +94,57 @@ class GameController {
       const users = getGame.users;
       const gameState = { ...getGame.game_state };
       const currentTurn = gameState.turn;
-      const index = users.indexOf(currentTurn);
+      let index;
+
+      //check what is the user's index
+      users.forEach((user, i) => {
+        if (user.seat_id === currentTurn) {
+          index = i;
+        }
+      });
+
       let newTurn;
 
       //if there is no next player, then return to banker
-      if (currentTurn === users.length) {
+      if (index === users.length - 1) {
         newTurn = 1;
       } else {
         newTurn = users[index + 1].seat_id;
       }
 
+      //change the game state to the turn
       gameState.turn = newTurn;
+
+      await getGame.update({
+        game_state: gameState,
+      });
+
+      //send the new game state
+      res.send({ turn: newTurn });
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
+  takeCard = async (req, res) => {
+    try {
+      const userId = req.userId;
+      const roomId = req.roomId;
+
+      const user = await this.db.User.findByPk(userId);
+      const seatId = user.seat_id;
+
+      const game = await this.db.Room.findByPk(roomId);
+      const gameState = { ...game.game_state };
+
+      const deck = gameState.deck;
+      const playerCards = gameState[seatId];
+      playerCards.push(deck.pop());
+
+      gameState[seatId] = playerCards;
+      gameState.deck = deck;
+      console.log(gameState.turn);
 
       await this.db.Room.update(
         {
@@ -117,11 +157,10 @@ class GameController {
         }
       );
 
-      //send the new game state
-      res.send({ turn: newTurn });
+      res.send(playerCards);
     } catch (error) {
       console.log(error);
-      res.send(error.message);
+      res.send(error);
     }
   };
 
