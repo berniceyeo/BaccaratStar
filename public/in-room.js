@@ -3,20 +3,28 @@ const gameStartBtn = document.getElementById("start");
 const leaveRoomBtn = document.getElementById("leave-room");
 const removeRoomBtn = document.getElementById("remove-room");
 const takeCardBtn = document.getElementById("take-card");
+const buyMoreBtn = document.getElementById("buy-chips-btn");
 
-//SECTIONS
+//SEATS SECTIONS
 const seatsBefore = document.getElementById("seats-bef");
 const mainSeat = document.getElementById("main-seat");
 const afterseating = document.getElementById("seats-after");
 const allSeats = document.getElementsByClassName("seats");
-const controls = document.getElementById("controls");
-const waitingMessage = document.getElementById("waiting-message");
-const resultsModalBody = document.getElementById("results");
+
+//CHIPS AND POINTS SECTIONS
 const points = document.getElementById("points");
 const pointsDiv = document.getElementById("points-div");
 const betSection = document.getElementById("bet");
 const chipsSection = document.getElementById("chips");
 const betDiv = document.getElementById("bet-div");
+
+// BUY MORE CHIPS FORM
+const additionalChips = document.getElementById("buychips");
+
+//OTHER SECTIONS
+const controls = document.getElementById("controls");
+const waitingMessage = document.getElementById("waiting-message");
+const resultsModalBody = document.getElementById("results");
 
 // SOCKET
 const socket = io("http://localhost:3004");
@@ -187,6 +195,21 @@ const takeCard = async () => {
   takeCardBtn.disabled = true;
 };
 
+const buyMoreChips = async () => {
+  const data = {
+    chips: additionalChips.value,
+  };
+  const response = await axios.put("game/buy-more", data);
+  $("#buy-more-modal").modal("hide");
+  chipsSection.innerHTML = response.data.newchips;
+  document.getElementById("chips-bought").innerHTML = response.data.chipsbought;
+  document.getElementById("chips-hand").innerHTML = response.data.newchips;
+  document.getElementById("buy-results-btn").click();
+  setTimeout(() => {
+    $("#buy-results-modal").modal("hide");
+  }, 2000);
+};
+
 //to end the game: only for banker side
 const endGame = async () => {
   const response = await axios.put("game/end");
@@ -241,6 +264,7 @@ gameStartBtn.addEventListener("click", gameStart);
 leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
 takeCardBtn.addEventListener("click", takeCard);
+buyMoreBtn.addEventListener("click", buyMoreChips);
 init();
 
 //When the person joins the room, they can click which seat they want to sit in

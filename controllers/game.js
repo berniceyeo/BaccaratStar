@@ -164,6 +164,30 @@ class GameController {
     }
   };
 
+  buyMore = async (req, res) => {
+    try {
+      const userId = req.userId;
+      const roomId = req.roomId;
+      const moreChips = req.body.chips;
+
+      const user = await this.db.User.findByPk(userId);
+      const existingChips = Number(user.chips);
+      const newChips = existingChips + Number(moreChips);
+      const existingChipsBought = Number(user.chips_bought);
+      const newChipsBought = existingChipsBought + Number(moreChips);
+
+      await user.update({
+        chips_bought: newChipsBought,
+        chips: newChips,
+      });
+
+      res.send({ newchips: newChips, chipsbought: newChipsBought });
+    } catch (error) {
+      console.log(error);
+      res.send(error);
+    }
+  };
+
   gameState = async (req, res) => {
     try {
       const userId = req.userId;

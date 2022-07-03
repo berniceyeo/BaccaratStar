@@ -29,6 +29,7 @@ router.put(
   gameController.changeTurn
 );
 router.put("/game/take-card", authenticate, checkGame, gameController.takeCard);
+router.put("/game/buy-more", authenticate, checkGame, gameController.buyMore);
 router.put("/game/seat", authenticate, checkGame, roomController.sitDown);
 router.put("/game/end", authenticate, checkGame, gameController.endGame);
 

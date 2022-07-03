@@ -49,11 +49,20 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" id="buy-more">
+              <!-- show modal of form to buy more chips -->
+              <button
+                type="button"
+                id="show-buy-more"
+                class="btn nav-link active"
+                data-bs-toggle="modal"
+                data-bs-target="#buy-more-modal"
+                aria-current="page"
+              >
                 Buy More
-              </a>
+              </button>
             </li>
             <li class="nav-item">
+              <!-- show modal of confirmation modal to make sure that the banker wants to leave  -->
               <a class="nav-link active" aria-current="page" id="leave-room">
                 Leave Room
               </a>
@@ -68,6 +77,132 @@
       class="container-fluid bg-table h-auto position-relative"
       style="min-height: 89.1vh;"
     >
+      <!-- Buy More Modal -->
+      <div
+        class="modal fade"
+        id="buy-more-modal"
+        tabindex="-1"
+        aria-labelledby="buy-more-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="buy-more-modalLabel">
+                Buy More Chips
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div>
+                  <label for="buychips" class="form-label mb-3"
+                    >Chips to Buy
+                  </label>
+                  <div
+                    id="buychips-invalid"
+                    class="alert alert-danger"
+                    role="alert"
+                    hidden
+                  >
+                    Invalid
+                  </div>
+                  <input
+                    type="number"
+                    id="buychips"
+                    class="form-control mb-3"
+                    id="name"
+                    name="buychips"
+                    step="10"
+                    min="1"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" id="buy-chips-btn" class="btn btn-warning">
+                Buy More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Button trigger modal -->
+      <button
+        type="button"
+        id="buy-results-btn"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#buy-results-modal"
+        hidden
+      >
+        Show Chips
+      </button>
+
+      <!-- Chips Bought Modal -->
+      <div
+        class="modal fade"
+        id="buy-results-modal"
+        tabindex="-1"
+        aria-labelledby="buy-results-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="buy-results-modalLabel">
+                More Chips Bought!
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body" style="color: white;">
+              <table class="table table-bordered  ">
+                <thead>
+                  <tr style="color: white; text-align: center;">
+                    <th scope="col">Chips Bought</th>
+                    <th scope="col">Chips in Hand</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="color: rgb(255, 189, 89); text-align: center;">
+                    <td id="chips-bought"></td>
+                    <td id="chips-hand"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Button trigger modal -->
       <button
         type="button"
