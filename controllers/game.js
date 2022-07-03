@@ -9,6 +9,9 @@ class GameController {
 
   gameStart = async (req, res) => {
     try {
+      console.log("started");
+      console.log(req.cookies);
+      let newBet = req.cookies.bet;
       const cardDeck = shuffleDeck(createDeck());
       const userId = req.userId;
       const roomId = req.roomId;
@@ -16,6 +19,16 @@ class GameController {
       //get the seatId of the user
       const user = await this.db.User.findByPk(userId);
       const seatId = user.seat_id;
+
+      console.log("new", newBet);
+      if (newBet !== undefined) {
+        await user.update({
+          bet: Number(newBet),
+        });
+        res.clearCookie("bet");
+      } else {
+        newBet = user.bet;
+      }
 
       //get all users from game and the game details
       const getGame = await this.db.Room.findOne({
@@ -60,6 +73,7 @@ class GameController {
 
       const data = {
         seatId,
+        newBet,
         game: getGame,
       };
 
@@ -74,7 +88,7 @@ class GameController {
   changeTurn = async (req, res) => {
     try {
       const roomId = req.roomId;
-
+      console.log("change turn", req.cookies);
       //get all users from game and the game details as we would need to pass the turn to the next user
       const getGame = await this.db.Room.findOne({
         where: {
@@ -191,15 +205,20 @@ class GameController {
   changeBet = async (req, res) => {
     try {
       const userId = req.userId;
-      const roomId = req.roomId;
       const newBet = req.body.bet;
+      console.log("newbet", newBet);
+      await this.db.User.update(
+        {
+          bet: newBet,
+        },
+        {
+          where: {
+            id: userId,
+          },
+        }
+      );
 
-      const user = await this.db.User.findByPk(userId);
-      await user.update({
-        bet: Number(newBet),
-      });
-
-      res.send({ newbet: newBet });
+      res.send("changed bet");
     } catch (error) {
       console.log(error);
       res.send(error);
@@ -237,6 +256,7 @@ class GameController {
   endGame = async (req, res) => {
     const transaction = await this.db.sequelize.transaction();
     try {
+      console.log(req.cookies);
       const userId = req.userId;
       //get the user
       const user = await this.db.User.findByPk(userId);

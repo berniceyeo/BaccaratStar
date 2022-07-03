@@ -1,13 +1,8 @@
 import getHash from "../helperfunctions/hash.js";
-import cookieParser from "cookie-parser";
 import sequelizePackage from "sequelize";
 import { Op } from "sequelize";
 
-const {
-  DatabaseError,
-  ValidationError,
-  UniqueConstraintError,
-} = sequelizePackage;
+const { UniqueConstraintError } = sequelizePackage;
 
 class RoomController {
   constructor(db) {

@@ -30,7 +30,6 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 //  data in AJAX POST requests is packaged differently from those in form submissions
 app.use(express.json());
-
 app.use(cookieParser());
 
 app.use("/", userRouter);

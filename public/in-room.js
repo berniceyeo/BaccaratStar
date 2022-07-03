@@ -41,6 +41,15 @@ socket.on("started", async (turn) => {
   const seatId = response.data.seatId;
   const userGameState = response.data.game.game_state[seatId];
   displayCardsPoints(userGameState);
+  //check if user has a new bet
+  const newBet = localStorage.getItem("newbet");
+  console.log(newBet);
+  if (newBet !== null) {
+    const response = await axios.put("/game/change-bet", { bet: newBet });
+    betSection.innerHTML = newBet;
+    localStorage.removeItem("newbet");
+  }
+
   // to show on everyone pages whose turn it is
   highlightingSeat(turn, seatId);
 });
@@ -212,12 +221,13 @@ const buyMoreChips = async () => {
 };
 
 const changeBet = async () => {
-  const data = {
-    bet: changeBetValue.value,
-  };
-  const response = await axios.put("game/change-bet", data);
-  $("#change-bet-modal").modal("hide");
-  betSection.innerHTML = response.data.newbet;
+  localStorage.setItem("newbet", changeBetValue.value);
+  document.getElementById("change-bet-form").hidden = true;
+  document.getElementById("change-bet-btn").disabled = true;
+  document.getElementById("bet-note").hidden = false;
+  setTimeout(() => {
+    $("#change-bet-modal").modal("hide");
+  }, 2000);
 };
 
 //to end the game: only for banker side
@@ -276,6 +286,11 @@ removeRoomBtn.addEventListener("click", removeRoom);
 takeCardBtn.addEventListener("click", takeCard);
 buyMoreBtn.addEventListener("click", buyMoreChips);
 changeBetBtn.addEventListener("click", changeBet);
+showChangeBetBtn.addEventListener("click", () => {
+  document.getElementById("change-bet-form").hidden = false;
+  document.getElementById("bet-note").hidden = true;
+  document.getElementById("change-bet-btn").disabled = false;
+});
 init();
 
 //When the person joins the room, they can click which seat they want to sit in
