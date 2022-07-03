@@ -280,6 +280,12 @@ const changeTurns = async (oldTurn, seatId) => {
   const startCountdown = setInterval(change, 20000);
 };
 
+const logout = async () => {
+  const response = await axios.post("/logout");
+  if (response.data === "logout") {
+    window.location.replace("http://localhost:3004");
+  }
+};
 // ------------------------------------
 // BUTTONS EVENTS
 // ------------------------------------
@@ -294,6 +300,7 @@ showChangeBetBtn.addEventListener("click", () => {
   document.getElementById("bet-note").hidden = true;
   document.getElementById("change-bet-btn").disabled = false;
 });
+document.getElementById("nav-logout").addEventListener("click", logout);
 init();
 
 //When the person joins the room, they can click which seat they want to sit in

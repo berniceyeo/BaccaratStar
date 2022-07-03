@@ -45,10 +45,15 @@ class UserController {
   };
 
   logoutUser = async (req, res) => {
-    res.clearCookie("userId");
-    res.clearCookie("hashedSession");
-    res.clearCookie("username");
-    res.redirect("/");
+    try {
+      res.clearCookie("userId");
+      res.clearCookie("hashedSession");
+      res.clearCookie("username");
+      res.send("logout");
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
   };
 
   createUser = async (req, res) => {

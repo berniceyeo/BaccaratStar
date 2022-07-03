@@ -33,14 +33,28 @@ const joinFormChips = document.getElementById("join-chips");
 const joinFormBet = document.getElementById("join-bet");
 
 //AJAX FUNCTIONS
+const showMain = () => {
+  mainForms.hidden = false;
+  joinForm.hidden = true;
+  createForm.hidden = true;
+};
 const showCreateForm = () => {
   mainForms.hidden = true;
+  joinForm.hidden = true;
   createForm.hidden = false;
 };
 
 const showJoinForm = () => {
   mainForms.hidden = true;
+  createForm.hidden = true;
   joinForm.hidden = false;
+};
+
+const logout = async () => {
+  const response = await axios.post("/logout");
+  if (response.data === "logout") {
+    window.location.replace("http://localhost:3004");
+  }
 };
 
 // create room jumps straight to the room, as the user cannot choose his seat.
@@ -144,3 +158,11 @@ createRoomBtn.addEventListener("click", createRoom);
 joinRoomBtn.addEventListener("click", joinRoom);
 showCreateRoomBtn.addEventListener("click", showCreateForm);
 showJoinRoomBtn.addEventListener("click", showJoinForm);
+document
+  .getElementById("nav-show-create")
+  .addEventListener("click", showCreateForm);
+document
+  .getElementById("nav-show-join")
+  .addEventListener("click", showJoinForm);
+document.getElementById("nav-show-main").addEventListener("click", showMain);
+document.getElementById("nav-logout").addEventListener("click", logout);

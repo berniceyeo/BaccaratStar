@@ -12,6 +12,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/login", userController.loginUser);
+router.post("/logout", userController.logoutUser);
 router.post("/signup", userController.createUser);
 
 router.get("/room", authenticate, (req, res) => {
