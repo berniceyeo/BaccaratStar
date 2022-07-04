@@ -68,6 +68,13 @@ io.on("connection", (socket) => {
     socket.to(room).emit("changed-turn", { ...turnInfo });
   });
 
+  socket.on("take-card", (data) => {
+    console.log("user-took-card", data);
+    const room = data[0];
+    const turn = data[1];
+    socket.to(room).emit("skip-turn", turn);
+  });
+
   // to display the results of the game
   socket.on("end-game", (data) => {
     console.log("ended", data);

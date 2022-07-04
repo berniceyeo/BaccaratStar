@@ -3,6 +3,7 @@ const gameStartBtn = document.getElementById("start");
 const leaveRoomBtn = document.getElementById("leave-room");
 const removeRoomBtn = document.getElementById("remove-room");
 const takeCardBtn = document.getElementById("take-card");
+const skipTurnBtn = document.getElementById("skip-turn-btn");
 const buyMoreBtn = document.getElementById("buy-chips-btn");
 const showChangeBetBtn = document.getElementById("show-change-bet");
 const changeBetBtn = document.getElementById("change-bet-btn");
@@ -26,23 +27,14 @@ const controls = document.getElementById("controls");
 const waitingMessage = document.getElementById("waiting-message");
 const resultsModalBody = document.getElementById("results");
 const navUsername = document.getElementById("navbarDropdown");
+//start countdown, change turns after 20 seconds
+let startCountdown;
 
-// SOCKET
+//
+//    SOCKET FUNCTIONS
+//
+
 const socket = io("http://localhost:3004");
-
-socket.on("seated", async (data) => {
-  const personSeatId = data.seatId;
-  const occupiedSeat = document.getElementById(personSeatId);
-  occupiedSeat.classList.add("taken");
-  const response = await axios.get("/game/gamestate");
-  const userSeatId = response.data.seatId;
-  const newUsers = response.data.game.users;
-  newUsers.forEach((user, i) => {
-    if (user.seat_id === personSeatId) {
-      presentingStatus(newUsers[i], userSeatId);
-    }
-  });
-});
 
 socket.on("started", async (turn) => {
   waitingMessage.hidden = true;
@@ -62,6 +54,17 @@ socket.on("started", async (turn) => {
 
   // to show on everyone pages whose turn it is
   highlightingSeat(turn, seatId);
+  controlsDisableEnable(turn, seatId);
+});
+
+socket.on("seated", async (data) => {
+  const personSeatId = data.seatId;
+  const occupiedSeat = document.getElementById(personSeatId);
+  occupiedSeat.classList.add("taken");
+  const response = await axios.get("/game/gamestate");
+  const userSeatId = response.data.seatId;
+  const newUsers = response.data.game.users;
+  presentingStatus(newUsers, userSeatId);
 });
 
 socket.on("changed-turn", async (data) => {
@@ -69,95 +72,102 @@ socket.on("changed-turn", async (data) => {
   const oldTurn = data.oldTurn;
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
-  //if now its users turn
+  controlsDisableEnable(newTurn, seatId);
   removeHighlighting(oldTurn, seatId);
   highlightingSeat(newTurn, seatId);
+});
+
+socket.on("skip-turn", async (turn) => {
+  const response = await axios.get("/game/userstate");
+  const seatId = response.data.seat_id;
+  clearInterval(startCountdown);
+  const newTurn = await change(turn, seatId);
+  if (newTurn !== 1) {
+    startCountdown = setInterval(() => {
+      change(newTurn, seatId);
+    }, 20000);
+  }
 });
 
 socket.on("forced-removal", async (data) => {
   console.log("to kick out");
   const response = await axios.put("game/clear-roomcookie");
   if (response.data.success === "yes") {
-    window.location.replace("http://localhost:3004/room");
+    showResults();
   }
 });
 
 socket.on("stop-game", async (data) => {
   console.log("no players left");
+  //if the game is still ongoing, end the game
   const response = await axios.put("game/end");
-  document.getElementById("mainseat-1").backgroundImage = "none";
-  document.getElementById("mainseat-2").backgroundImage = "none";
-  document.getElementById("mainseat-3").backgroundImage = "none";
+  clearCards();
+  //reload to refresh stats
   window.location.reload();
 });
 
 socket.on("ended", async (winStatus) => {
+  points.innerHTML = "";
+  clearCards();
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
   const chips = response.data.chips;
   chipsSection.innerHTML = chips;
   const winState = winStatus[seatId];
-  points.innerHTML = "";
-  document.getElementById("mainseat-1").backgroundImage = "none";
-  document.getElementById("mainseat-2").backgroundImage = "none";
-  document.getElementById("mainseat-3").backgroundImage = "none";
   resultsModalBody.innerHTML = `You ${winState}`;
   document.getElementById("results-modal-btn").click();
   removeHighlighting(1, seatId);
+  //AFTER 1 SEC TO HIDE MODAL OF RESULTS
   const hide = setTimeout(hideModal, 1000);
 });
 
-//checks the current status of the users' game so that when they refresh, they do not lose the status of their game
-const hideModal = () => {
-  $("#results-modal").modal("hide");
-};
+//
+//    PAGE FUNCTIONS
+//
 
 const init = async () => {
   try {
     const response = await axios.get("/game/userstate");
-    const room = response.data.room_id;
-    const username = response.data.username;
+    const user = response.data;
+    const room = user.room_id;
+    const seatId = user.seat_id;
+    const { username, bet, chips } = user;
     navUsername.innerHTML = username;
     //to on the server side, join the room
     socket.emit("join-room", room);
     console.log(`user is attempting to join ${room}`);
-
-    const seatId = response.data.seat_id;
-    presentingStatus(response.data, seatId);
-    const bet = response.data.bet;
-    const chips = response.data.chips;
     betSection.innerHTML = bet;
     chipsSection.innerHTML = chips;
-    const checkUsers = await axios.get("/game/roomusers");
-    console.log(checkUsers.data.users);
-    if (checkUsers.data.users !== undefined) {
-      for (let i = 0; i < checkUsers.data.users.length; i++) {
-        presentingStatus(checkUsers.data.users[i], seatId);
-      }
-    }
 
-    highlightingOtherSeats(checkUsers.data.users, "seat-");
-    //Check if the person has sit down
+    //CHECK FOR USERS WHO HAVE SAT DOWN
+    const checkUsers = await axios.get("/game/roomusers");
+    const otherUsers = checkUsers.data.users;
+    if (otherUsers !== undefined) {
+      const allUsers = [user, ...otherUsers];
+      presentingStatus(allUsers, seatId);
+    }
+    //highlights the seat of the other users
+    highlightingOtherSeats(otherUsers, "seat-");
+
+    //  CHECK IF USER HAS SAT DOWN
     if (seatId === null || seatId === undefined) {
       seatsBefore.hidden = false;
     } else {
-      // if the person sat down and is not banker
       if (seatId !== 1) {
         controls.hidden = false;
         gameStartBtn.hidden = true;
         reshuffleSeats(seatId);
         waitingMessage.hidden = false;
       } else {
-        //if the person is banker
         showChangeBetBtn.hidden = true;
         betDiv.hidden = true;
         pointsDiv.style.left = "48%";
       }
 
-      highlightingOtherSeats(checkUsers.data.users, "");
-      // if the person sat down, apply to all inclu banker
+      highlightingOtherSeats(otherUsers, "");
       afterseating.hidden = false;
-      //to check if the game has started
+
+      //CHECK IF GAME HAS STARTED
       const res = await axios.get("/game/gamestate");
       const gameState = res.data.game.game_state;
       // if the game has started
@@ -177,60 +187,30 @@ const init = async () => {
   }
 };
 
-//when they exit room for users whom they are not banker
-
-const exitRoom = () => {
-  try {
-    axios.put(`/game/leave`).then((response) => {
-      console.log(response.data);
-      if (response.data === "User is banker") {
-        document.getElementById("leave-room-modal-btn").click();
-      } else if (response.data.success === "no") {
-        socket.emit("no-player", response.data.roomId);
-        window.location.replace("http://localhost:3004/room");
-      } else if (response.data === "left room") {
-        window.location.replace("http://localhost:3004/room");
-      }
-    });
-  } catch (error) {}
-};
-
-//when they exit room for users whom they are banker
-const removeRoom = () => {
-  try {
-    axios.delete(`/game/delete`).then((response) => {
-      if (response.data.success === "yes") {
-        const roomId = response.data.roomId;
-        socket.emit("removed-room", roomId);
-        window.location.replace("http://localhost:3004/room");
-      }
-    });
-  } catch (error) {}
-};
-
-// initialise game start
 const gameStart = async () => {
   try {
     const response = await axios.post("/game/start");
-    const userResponse = await axios.get("/game/userstate");
-    const room = userResponse.data.room_id;
-    const chips = userResponse.data.chips;
-    chipsSection.innerHTML = chips;
-
-    console.log(response);
     if (response.data === "no other players") {
       throw new Error("no other players");
     }
+    const gameState = response.data.game.game_state;
+    const user = response.data.user;
+    const room = user.room_id;
+    const chips = user.chips;
+    const seatId = user.seat_id;
+    chipsSection.innerHTML = chips;
 
-    const seatId = response.data.seatId;
-    console.log(seatId);
-    const turn = response.data.game.game_state.turn;
-    const userGameState = response.data.game.game_state[seatId];
+    const turn = gameState.turn;
+    const userGameState = gameState[seatId];
     displayCardsPoints(userGameState);
     highlightingSeat(turn, seatId);
+
     socket.emit("start-game", [room, turn]);
     console.log(turn, seatId);
-    changeTurns(turn, seatId);
+    controlsDisableEnable(turn, seatId);
+    startCountdown = setInterval(() => {
+      change(turn, seatId);
+    }, 20000);
   } catch (error) {
     console.log(error);
     if (error.message === "no other players") {
@@ -241,10 +221,60 @@ const gameStart = async () => {
   }
 };
 
+// time out event to change turn every 20 seconds
+const change = async (oldTurn, seatId) => {
+  const response = await axios.put("game/turn-change");
+  console.log(oldTurn, seatId);
+  const newTurn = response.data.turn;
+  const room = response.data.room;
+  //send to socket that turn has been changed
+  socket.emit("change-turn", [room, { newTurn, oldTurn }]);
+  controlsDisableEnable(newTurn, seatId);
+  removeHighlighting(oldTurn, seatId);
+  highlightingSeat(newTurn, seatId);
+
+  if (newTurn === 1) {
+    console.log("banker's turn");
+    clearInterval(startCountdown);
+    // if turn is 1, then after banker's turn to end it
+    const end = setTimeout(endGame, 20000);
+  }
+  return newTurn;
+};
+
 const takeCard = async () => {
   const response = await axios.put("game/take-card");
-  displayCardsPoints(response.data);
+  const { cards, turn, seatId, roomId } = response.data;
   takeCardBtn.disabled = true;
+  skipTurnBtn.disabled = true;
+  // if the user is not the banker, should send to banker (game functionality is running)  takeCardBtn.disabled = true;
+  displayCardsPoints(cards);
+  if (seatId !== 1) {
+    socket.emit("take-card", [roomId, turn]);
+  } else if (turn === 1) {
+    console.log("end of banker's turn");
+    clearInterval(startCountdown);
+    //as the banker has chosen to skip his turn
+    const end = setTimeout(endGame, 1000);
+  }
+};
+
+const skipTurn = async () => {
+  const response = await axios.get("/game/gamestate");
+  const { seatId, game } = response.data;
+  const roomId = game.id;
+  const turn = game.game_state.turn;
+  takeCardBtn.disabled = true;
+  skipTurnBtn.disabled = true;
+
+  if (seatId !== 1) {
+    socket.emit("take-card", [roomId, turn]);
+  } else if (turn === 1) {
+    console.log("end of banker's turn");
+    clearInterval(startCountdown);
+    //as the banker has chosen to skip his turn
+    const end = setTimeout(endGame, 1000);
+  }
 };
 
 const buyMoreChips = async () => {
@@ -272,15 +302,26 @@ const changeBet = async () => {
   }, 2000);
 };
 
+const showResults = () => {
+  $("#leave-room-modal").modal("hide");
+  document.getElementById("game-results-modalLabel").innerHTML =
+    "GAME IS ENDING! <br> Here are the Results of the Game! ";
+  document.getElementById("game-results-btn").click();
+  setTimeout(() => {
+    window.location.replace("http://localhost:3004/room");
+  }, 2000);
+};
+
 //to end the game: only for banker side
 const endGame = async () => {
   const response = await axios.put("game/end");
+  console.log(response);
   const seatId = response.data.seatId;
   const room = response.data.room;
   const winStatus = response.data.winStatus;
-  console.log(room);
+
   socket.emit("end-game", [room, winStatus]);
-  console.log(winStatus);
+
   //if the user is not banker, they will show the win/lose
   let innerContent = "";
   for (const [key, value] of Object.entries(winStatus)) {
@@ -288,6 +329,8 @@ const endGame = async () => {
       innerContent += `Seat ${key} : Lose <br>`;
     } else if (value === "Lose") {
       innerContent += `Seat ${key} : Win <br>`;
+    } else if (value === "Draw") {
+      innerContent += `Seat ${key} : Draw <br>`;
     }
   }
   resultsModalBody.innerHTML = innerContent;
@@ -299,29 +342,36 @@ const endGame = async () => {
   }
   const hide = setTimeout(hideModal, 1000);
   points.innerHTML = "";
-  document.getElementById("mainseat-1").backgroundImage = "none";
-  document.getElementById("mainseat-2").backgroundImage = "none";
-  document.getElementById("mainseat-3").backgroundImage = "none";
-  const start = setTimeout(gameStart, 2500);
+  clearCards();
+  const start = setTimeout(gameStart, 2000);
 };
 
-// so every thirty seconds
-const changeTurns = async (oldTurn, seatId) => {
-  const change = async () => {
-    const response = await axios.put("game/turn-change");
-    const newTurn = response.data.turn;
-    const room = response.data.room;
-    socket.emit("change-turn", [room, { newTurn, oldTurn }]);
-    removeHighlighting(oldTurn, seatId);
-    highlightingSeat(newTurn, seatId);
+const exitRoom = () => {
+  try {
+    axios.put(`/game/leave`).then((response) => {
+      console.log(response.data);
+      if (response.data === "User is banker") {
+        document.getElementById("leave-room-modal-btn").click();
+      } else if (response.data.success === "no") {
+        socket.emit("no-player", response.data.roomId);
+        showResults();
+      } else if (response.data === "left room") {
+        showResults();
+      }
+    });
+  } catch (error) {}
+};
 
-    if (newTurn === 1) {
-      console.log("banker's turn");
-      clearInterval(startCountdown);
-      const end = setTimeout(endGame, 20000);
-    }
-  };
-  const startCountdown = setInterval(change, 20000);
+const removeRoom = () => {
+  try {
+    axios.delete(`/game/delete`).then((response) => {
+      if (response.data.success === "yes") {
+        const roomId = response.data.roomId;
+        socket.emit("removed-room", roomId);
+        showResults();
+      }
+    });
+  } catch (error) {}
 };
 
 const logout = async () => {
@@ -330,6 +380,7 @@ const logout = async () => {
     window.location.replace("http://localhost:3004");
   }
 };
+
 // ------------------------------------
 // BUTTONS EVENTS
 // ------------------------------------
@@ -337,6 +388,7 @@ gameStartBtn.addEventListener("click", gameStart);
 leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
 takeCardBtn.addEventListener("click", takeCard);
+skipTurnBtn.addEventListener("click", skipTurn);
 buyMoreBtn.addEventListener("click", buyMoreChips);
 changeBetBtn.addEventListener("click", changeBet);
 showChangeBetBtn.addEventListener("click", () => {

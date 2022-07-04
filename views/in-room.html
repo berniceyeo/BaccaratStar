@@ -339,7 +339,7 @@
       >
         <div class="modal-dialog">
           <div class="modal-content bg-black">
-            <div class="modal-header">
+            <div class="modal-header" id="game-results-header">
               <h5 class="modal-title" id="game-results-modalLabel">
                 Status
               </h5>
@@ -357,6 +357,7 @@
                     <th scope="col">User</th>
                     <th scope="col">Chips Bought</th>
                     <th scope="col">Chips in Hand</th>
+                    <th scope="col">Win/Lose</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
@@ -640,7 +641,7 @@
               </div>
               <div class="d-grid gap-2 col-sm-6 col-12 mx-auto p-0">
                 <button
-                  id="skip-turn"
+                  id="skip-turn-btn"
                   class="secondary-btn p-4"
                   style="margin-right: 2px"
                   disabled

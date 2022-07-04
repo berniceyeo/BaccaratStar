@@ -9,8 +9,6 @@ class GameController {
 
   gameStart = async (req, res) => {
     try {
-      console.log("started");
-      console.log(req.cookies);
       let newBet = req.cookies.bet;
       const cardDeck = shuffleDeck(createDeck());
       const userId = req.userId;
@@ -37,6 +35,11 @@ class GameController {
         },
         include: {
           model: this.db.User,
+          where: {
+            seat_id: {
+              [Op.ne]: null,
+            },
+          },
         },
       });
       const users = getGame.users;
@@ -72,7 +75,7 @@ class GameController {
       });
 
       const data = {
-        seatId,
+        user,
         newBet,
         game: getGame,
       };
@@ -169,7 +172,14 @@ class GameController {
         }
       );
 
-      res.send(playerCards);
+      const data = {
+        cards: playerCards,
+        seatId,
+        roomId,
+        turn: gameState.turn,
+      };
+
+      res.send(data);
     } catch (error) {
       console.log(error);
       res.send(error);

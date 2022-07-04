@@ -68,6 +68,12 @@ const reshuffleSeats = (seatId) => {
 };
 
 //DISPLAYS CARDS
+const clearCards = () => {
+  document.getElementById("mainseat-1").style.backgroundImage = "none";
+  document.getElementById("mainseat-2").style.backgroundImage = "none";
+  document.getElementById("mainseat-3").style.backgroundImage = "none";
+};
+
 const displayCardsPoints = (data) => {
   console.log("cards", data);
   let sum = 0;
@@ -89,7 +95,7 @@ const displayCardsPoints = (data) => {
     document.getElementById("mainseat-1").style.left = "44%";
     document.getElementById("mainseat-2").style.left = "48%";
     document.getElementById("mainseat-3").hidden = true;
-    document.getElementById("mainseat-3").backgroundImage = "none";
+    document.getElementById("mainseat-3").style.backgroundImage = "none";
   }
 
   const points = document.getElementById("points");
@@ -132,28 +138,48 @@ const highlightingOtherSeats = (users, string) => {
   }
 };
 
-const presentingStatus = (user, seatId) => {
-  console.log(user);
+const presentingStatus = (users, seatId) => {
   document.getElementById("game-results-btn").hidden = false;
   const table = document.getElementById("game-results-table");
 
-  const row = table.insertRow();
-  const cell1 = row.insertCell(0);
-  const cell2 = row.insertCell(1);
-  const cell3 = row.insertCell(2);
-  if (user.banker === true) {
-    cell1.innerHTML = "Banker";
-  } else {
-    cell1.innerHTML = user.username;
-    cell1.classList.add("text-capitalize");
+  for (let i = 0; i < users.length; i++) {
+    const user = users[i];
+    const row = table.insertRow(i + 1);
+    const cell1 = row.insertCell(0);
+    const cell2 = row.insertCell(1);
+    const cell3 = row.insertCell(2);
+    const cell4 = row.insertCell(3);
+    if (user.banker === true) {
+      cell1.innerHTML = "Banker";
+    } else {
+      cell1.innerHTML = user.username;
+      cell1.classList.add("text-capitalize");
+    }
+
+    cell2.innerHTML = user.chips_bought;
+    cell3.innerHTML = user.chips;
+    cell4.innerHTML = Number(user.chips) - Number(user.chips_bought);
+
+    if (user.seat_id === seatId) {
+      row.classList.add("table-warning");
+    } else {
+      row.style.color = "white";
+    }
   }
+};
 
-  cell2.innerHTML = user.chips_bought;
-  cell3.innerHTML = user.chips;
+const hideModal = () => {
+  $("#results-modal").modal("hide");
+};
 
-  if (user.seat_id === seatId) {
-    row.classList.add("table-warning");
+const controlsDisableEnable = (turn, seatId) => {
+  const takeCardBtn = document.getElementById("take-card");
+  const skipTurnBtn = document.getElementById("skip-turn-btn");
+  if (turn !== seatId) {
+    takeCardBtn.disabled = true;
+    skipTurnBtn.disabled = true;
   } else {
-    row.style.color = "white";
+    takeCardBtn.disabled = false;
+    skipTurnBtn.disabled = false;
   }
 };
