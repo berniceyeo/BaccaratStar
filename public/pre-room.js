@@ -9,6 +9,7 @@ const mainForms = document.getElementById("create-or-join");
 const mainSeat = document.getElementById("main-seat");
 const createForm = document.getElementById("create-room");
 const joinForm = document.getElementById("join-room");
+const navUsername = document.getElementById("navbarDropdown");
 
 //ERROR MESSAGES
 const createInvalidName = document.getElementById("create-name-invalid");
@@ -54,6 +55,14 @@ const logout = async () => {
   const response = await axios.post("/logout");
   if (response.data === "logout") {
     window.location.replace("http://localhost:3004");
+  }
+};
+
+const init = async () => {
+  const response = await axios.get("/game/userstate");
+  const name = response.data.username;
+  if (name !== null || undefined) {
+    navUsername.innerHTML = name;
   }
 };
 
@@ -166,3 +175,4 @@ document
   .addEventListener("click", showJoinForm);
 document.getElementById("nav-show-main").addEventListener("click", showMain);
 document.getElementById("nav-logout").addEventListener("click", logout);
+init();

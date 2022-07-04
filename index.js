@@ -75,6 +75,13 @@ io.on("connection", (socket) => {
     const winStatus = data[1];
     socket.to(room).emit("ended", winStatus);
   });
+
+  // to kick all users in a room out of the room
+  socket.on("removed-room", (data) => {
+    console.log("ended", data);
+    const room = data;
+    socket.to(room).emit("forced-removal", data);
+  });
 });
 
 http.listen(PORT, () => {

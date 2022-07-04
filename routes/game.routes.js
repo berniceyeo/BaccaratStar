@@ -22,6 +22,12 @@ router.get(
 );
 //get the status of the user (i.e. the user's seat and the person's room)
 router.get("/game/userstate", authenticate, roomController.checkRoomSeat);
+router.get(
+  "/game/roomusers",
+  authenticate,
+  checkGame,
+  roomController.checkUsers
+);
 router.put(
   "/game/turn-change",
   authenticate,
@@ -37,8 +43,12 @@ router.put(
   gameController.changeBet
 );
 router.put("/game/seat", authenticate, checkGame, roomController.sitDown);
+router.put(
+  "/game/clear-roomcookie",
+  authenticate,
+  roomController.removeRoomCookies
+);
 router.put("/game/end", authenticate, checkGame, gameController.endGame);
-
 router.put("/game/leave", authenticate, checkGame, roomController.leaveRoom);
 router.delete(
   "/game/delete",

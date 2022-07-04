@@ -21,6 +21,32 @@ class RoomController {
     }
   };
 
+  checkUsers = async (req, res) => {
+    try {
+      const { userId } = req;
+      const { roomId } = req;
+      const user = await this.db.User.findByPk(userId);
+      const room = await this.db.Room.findOne({
+        where: {
+          id: roomId,
+        },
+        include: {
+          model: this.db.User,
+          where: {
+            id: {
+              [Op.ne]: userId,
+            },
+          },
+        },
+      });
+
+      res.send(room);
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
   createRoom = async (req, res) => {
     const transaction = await this.db.sequelize.transaction();
     try {
@@ -196,8 +222,28 @@ class RoomController {
           chips_bought: null,
           updatedAt: Date.now(),
         });
-
+        res.clearCookie("room");
         res.send("left room");
+      }
+    } catch (error) {
+      console.log(error);
+      res.send(error.message);
+    }
+  };
+
+  removeRoomCookies = async (req, res) => {
+    try {
+      const userId = req.userId;
+      const user = await this.db.User.findByPk(userId);
+      const userJson = user.toJSON();
+
+      console.log(userJson.room_id);
+      console.log(userJson.roomId);
+      if (userJson.room_id !== null) {
+        throw new Error("User has yet to be kicked");
+      } else {
+        res.clearCookie("room");
+        res.send({ success: "yes" });
       }
     } catch (error) {
       console.log(error);
@@ -210,6 +256,8 @@ class RoomController {
 
     try {
       const { userId } = req;
+      const roomId = req.roomId;
+
       const user = await this.db.User.findByPk(userId);
       const userJson = user.toJSON();
 
@@ -217,7 +265,7 @@ class RoomController {
         throw new Error("User is not banker");
       }
 
-      const game = await this.db.Room.findByPk(userJson.room_id);
+      const game = await this.db.Room.findByPk(roomId);
       const allUsers = await game.getUsers();
 
       for (let i = 0; i < allUsers.length; i++) {
@@ -242,7 +290,11 @@ class RoomController {
 
       await transaction.commit();
       res.clearCookie("room");
-      res.send("removed room");
+      const data = {
+        success: "yes",
+        roomId,
+      };
+      res.send(data);
     } catch (error) {
       console.log(error);
       await transaction.rollback();

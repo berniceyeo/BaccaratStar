@@ -119,3 +119,15 @@ const removeHighlighting = (turn, seatId) => {
     turnSeat.classList.remove("turn");
   }
 };
+
+const highlightingOtherSeats = (users, string) => {
+  if (users !== undefined) {
+    users.forEach((user) => {
+      if (user.seat_id !== 1) {
+        const seat = document.getElementById(`${string}${user.seat_id}`);
+        seat.classList.add("taken");
+        seat.disabled = true;
+      }
+    });
+  }
+};

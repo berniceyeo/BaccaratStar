@@ -25,6 +25,7 @@ const changeBetValue = document.getElementById("changebet");
 const controls = document.getElementById("controls");
 const waitingMessage = document.getElementById("waiting-message");
 const resultsModalBody = document.getElementById("results");
+const navUsername = document.getElementById("navbarDropdown");
 
 // SOCKET
 const socket = io("http://localhost:3004");
@@ -64,6 +65,14 @@ socket.on("changed-turn", async (data) => {
   highlightingSeat(newTurn, seatId);
 });
 
+socket.on("forced-removal", async (data) => {
+  console.log("to kick out");
+  const response = await axios.put("game/clear-roomcookie");
+  if (response.data.success === "yes") {
+    window.location.replace("http://localhost:3004/room");
+  }
+});
+
 socket.on("ended", async (winStatus) => {
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
@@ -73,11 +82,11 @@ socket.on("ended", async (winStatus) => {
   resultsModalBody.innerHTML = `You ${winState}`;
   document.getElementById("results-modal-btn").click();
   removeHighlighting(1, seatId);
+  const hide = setTimeout(hideModal, 1000);
   points.innerHTML = "";
   document.getElementById("mainseat-1").backgroundImage = "none";
   document.getElementById("mainseat-2").backgroundImage = "none";
   document.getElementById("mainseat-3").backgroundImage = "none";
-  const hide = setTimeout(hideModal, 1000);
 });
 
 //checks the current status of the users' game so that when they refresh, they do not lose the status of their game
@@ -89,6 +98,9 @@ const init = async () => {
   try {
     const response = await axios.get("/game/userstate");
     const room = response.data.room_id;
+    const username = response.data.username;
+    navUsername.innerHTML = username;
+    //to on the server side, join the room
     socket.emit("join-room", room);
     console.log(`user is attempting to join ${room}`);
 
@@ -97,8 +109,10 @@ const init = async () => {
     const chips = response.data.chips;
     betSection.innerHTML = bet;
     chipsSection.innerHTML = chips;
-
-    //if the person has yet to sit down
+    const checkUsers = await axios.get("/game/roomusers");
+    console.log("otherusers", checkUsers);
+    highlightingOtherSeats(checkUsers.data.users, "seat-");
+    //Check if the person has sit down
     if (seatId === null || seatId === undefined) {
       seatsBefore.hidden = false;
     } else {
@@ -109,11 +123,13 @@ const init = async () => {
         reshuffleSeats(seatId);
         waitingMessage.hidden = false;
       } else {
+        //if the person is banker
         showChangeBetBtn.hidden = true;
         betDiv.hidden = true;
         pointsDiv.style.left = "48%";
       }
 
+      highlightingOtherSeats(checkUsers.data.users, "");
       // if the person sat down, apply to all inclu banker
       afterseating.hidden = false;
       //to check if the game has started
@@ -154,10 +170,10 @@ const exitRoom = () => {
 const removeRoom = () => {
   try {
     axios.delete(`/game/delete`).then((response) => {
-      if (response.data === "removed room") {
+      if (response.data.success === "yes") {
+        const roomId = response.data.roomId;
+        socket.emit("removed-room", roomId);
         window.location.replace("http://localhost:3004/room");
-      } else {
-        document.getElementById("leave-room-modal-btn").click();
       }
     });
   } catch (error) {}
@@ -253,11 +269,11 @@ const endGame = async () => {
     const seat = document.getElementById(`mainseat-${i}`);
     seat.hidden = true;
   }
+  const hide = setTimeout(hideModal, 1000);
   points.innerHTML = "";
   document.getElementById("mainseat-1").backgroundImage = "none";
   document.getElementById("mainseat-2").backgroundImage = "none";
   document.getElementById("mainseat-3").backgroundImage = "none";
-  const hide = setTimeout(hideModal, 1000);
   const start = setTimeout(gameStart, 2500);
 };
 
