@@ -30,9 +30,18 @@ const navUsername = document.getElementById("navbarDropdown");
 // SOCKET
 const socket = io("http://localhost:3004");
 
-socket.on("seated", (data) => {
-  const occupiedSeat = document.getElementById(data.seatId);
+socket.on("seated", async (data) => {
+  const personSeatId = data.seatId;
+  const occupiedSeat = document.getElementById(personSeatId);
   occupiedSeat.classList.add("taken");
+  const response = await axios.get("/game/gamestate");
+  const userSeatId = response.data.seatId;
+  const newUsers = response.data.game.users;
+  newUsers.forEach((user, i) => {
+    if (user.seat_id === personSeatId) {
+      presentingStatus(newUsers[i], userSeatId);
+    }
+  });
 });
 
 socket.on("started", async (turn) => {
@@ -73,20 +82,29 @@ socket.on("forced-removal", async (data) => {
   }
 });
 
+socket.on("stop-game", async (data) => {
+  console.log("no players left");
+  const response = await axios.put("game/end");
+  document.getElementById("mainseat-1").backgroundImage = "none";
+  document.getElementById("mainseat-2").backgroundImage = "none";
+  document.getElementById("mainseat-3").backgroundImage = "none";
+  window.location.reload();
+});
+
 socket.on("ended", async (winStatus) => {
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
   const chips = response.data.chips;
   chipsSection.innerHTML = chips;
   const winState = winStatus[seatId];
-  resultsModalBody.innerHTML = `You ${winState}`;
-  document.getElementById("results-modal-btn").click();
-  removeHighlighting(1, seatId);
-  const hide = setTimeout(hideModal, 1000);
   points.innerHTML = "";
   document.getElementById("mainseat-1").backgroundImage = "none";
   document.getElementById("mainseat-2").backgroundImage = "none";
   document.getElementById("mainseat-3").backgroundImage = "none";
+  resultsModalBody.innerHTML = `You ${winState}`;
+  document.getElementById("results-modal-btn").click();
+  removeHighlighting(1, seatId);
+  const hide = setTimeout(hideModal, 1000);
 });
 
 //checks the current status of the users' game so that when they refresh, they do not lose the status of their game
@@ -105,12 +123,19 @@ const init = async () => {
     console.log(`user is attempting to join ${room}`);
 
     const seatId = response.data.seat_id;
+    presentingStatus(response.data, seatId);
     const bet = response.data.bet;
     const chips = response.data.chips;
     betSection.innerHTML = bet;
     chipsSection.innerHTML = chips;
     const checkUsers = await axios.get("/game/roomusers");
-    console.log("otherusers", checkUsers);
+    console.log(checkUsers.data.users);
+    if (checkUsers.data.users !== undefined) {
+      for (let i = 0; i < checkUsers.data.users.length; i++) {
+        presentingStatus(checkUsers.data.users[i], seatId);
+      }
+    }
+
     highlightingOtherSeats(checkUsers.data.users, "seat-");
     //Check if the person has sit down
     if (seatId === null || seatId === undefined) {
@@ -157,9 +182,13 @@ const init = async () => {
 const exitRoom = () => {
   try {
     axios.put(`/game/leave`).then((response) => {
+      console.log(response.data);
       if (response.data === "User is banker") {
         document.getElementById("leave-room-modal-btn").click();
-      } else if ("left room") {
+      } else if (response.data.success === "no") {
+        socket.emit("no-player", response.data.roomId);
+        window.location.replace("http://localhost:3004/room");
+      } else if (response.data === "left room") {
         window.location.replace("http://localhost:3004/room");
       }
     });
@@ -199,7 +228,6 @@ const gameStart = async () => {
     const userGameState = response.data.game.game_state[seatId];
     displayCardsPoints(userGameState);
     highlightingSeat(turn, seatId);
-    console.log(room);
     socket.emit("start-game", [room, turn]);
     console.log(turn, seatId);
     changeTurns(turn, seatId);

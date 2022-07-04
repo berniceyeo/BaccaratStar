@@ -206,6 +206,7 @@ class RoomController {
   };
 
   leaveRoom = async (req, res) => {
+    const { roomId } = req;
     try {
       const { userId } = req;
       const user = await this.db.User.findByPk(userId);
@@ -222,12 +223,33 @@ class RoomController {
           chips_bought: null,
           updatedAt: Date.now(),
         });
+
         res.clearCookie("room");
+        const room = await this.db.Room.findOne({
+          where: {
+            id: roomId,
+          },
+          include: {
+            model: this.db.User,
+          },
+        });
+
+        if (room.users.length >= 1) {
+          throw new Error("User is last user");
+        }
         res.send("left room");
       }
     } catch (error) {
       console.log(error);
-      res.send(error.message);
+      if (error.message === "User is last user") {
+        const data = {
+          success: "no",
+          roomId,
+        };
+        res.send(data);
+      } else {
+        res.send(error.message);
+      }
     }
   };
 

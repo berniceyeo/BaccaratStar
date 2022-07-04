@@ -76,6 +76,13 @@ io.on("connection", (socket) => {
     socket.to(room).emit("ended", winStatus);
   });
 
+  // to display the results of the game
+  socket.on("no-player", (data) => {
+    console.log("no more players in room");
+    const room = data;
+    socket.to(room).emit("stop-game", data);
+  });
+
   // to kick all users in a room out of the room
   socket.on("removed-room", (data) => {
     console.log("ended", data);

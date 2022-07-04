@@ -131,3 +131,29 @@ const highlightingOtherSeats = (users, string) => {
     });
   }
 };
+
+const presentingStatus = (user, seatId) => {
+  console.log(user);
+  document.getElementById("game-results-btn").hidden = false;
+  const table = document.getElementById("game-results-table");
+
+  const row = table.insertRow();
+  const cell1 = row.insertCell(0);
+  const cell2 = row.insertCell(1);
+  const cell3 = row.insertCell(2);
+  if (user.banker === true) {
+    cell1.innerHTML = "Banker";
+  } else {
+    cell1.innerHTML = user.username;
+    cell1.classList.add("text-capitalize");
+  }
+
+  cell2.innerHTML = user.chips_bought;
+  cell3.innerHTML = user.chips;
+
+  if (user.seat_id === seatId) {
+    row.classList.add("table-warning");
+  } else {
+    row.style.color = "white";
+  }
+};

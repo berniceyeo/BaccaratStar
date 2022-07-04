@@ -76,6 +76,21 @@
                 </li>
               </ul>
             </li>
+
+            <li class="nav-item">
+              <!-- show modal of form to see players' chips -->
+
+              <button
+                type="button"
+                id="game-results-btn"
+                class="btn nav-link active "
+                data-bs-toggle="modal"
+                data-bs-target="#game-results-modal"
+                hidden
+              >
+                Status
+              </button>
+            </li>
             <li class="nav-item">
               <!-- show modal of form to change bet -->
               <button
@@ -276,7 +291,7 @@
           <div class="modal-content bg-black">
             <div class="modal-header">
               <h5 class="modal-title" id="buy-results-modalLabel">
-                More Chips Bought!
+                Player Chips
               </h5>
               <button
                 type="button"
@@ -299,6 +314,52 @@
                     <td id="chips-hand"></td>
                   </tr>
                 </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chips Bought Modal -->
+      <div
+        class="modal fade"
+        id="game-results-modal"
+        tabindex="-1"
+        aria-labelledby="game-results-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="game-results-modalLabel">
+                Status
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body" style="color: white;">
+              <table class="table table-bordered" id="game-results-table">
+                <thead>
+                  <tr style="color: white; text-align: center;">
+                    <th scope="col">User</th>
+                    <th scope="col">Chips Bought</th>
+                    <th scope="col">Chips in Hand</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
               </table>
             </div>
             <div class="modal-footer">
