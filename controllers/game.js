@@ -1,6 +1,7 @@
 import { createDeck, shuffleDeck } from "../helperfunctions/deck.js";
 import { generateWinStatus } from "../helperfunctions/checkwin.js";
 import { Op } from "sequelize";
+import calculateWinnings from "../helperfunctions/countWinnings.js";
 
 class GameController {
   constructor(db) {
@@ -264,15 +265,13 @@ class GameController {
   endGame = async (req, res) => {
     const transaction = await this.db.sequelize.transaction();
     try {
-      console.log(req.cookies);
       const userId = req.userId;
       const roomId = req.roomId;
       //get the user
       const user = await this.db.User.findByPk(userId);
       let bankerChips = Number(user.chips);
-      console.log("banker", bankerChips);
+      let newBankerChips = Number(user.chips);
       const seatId = user.seat_id;
-
       const game = await user.getRoom();
       //generate win status
       const winStatus = generateWinStatus(game.game_state);
@@ -291,20 +290,20 @@ class GameController {
         });
         let playerBet = Number(player.bet);
         let playerChips = Number(player.chips);
-        console.log("player", playerBet, playerChips);
-        if (value === "Win") {
-          bankerChips = bankerChips - playerBet;
-          playerChips = playerChips + playerBet;
-        } else if (value === "Lose") {
-          bankerChips = bankerChips + playerBet;
-          playerChips = playerChips - playerBet;
-        }
-        console.log("player", playerBet, playerChips);
-        console.log("banker", bankerChips);
+        const chipsArray = calculateWinnings(
+          playerBet,
+          playerChips,
+          bankerChips,
+          value
+        );
 
+        const newPlayerChips = Number(chipsArray[0]);
+        newBankerChips = Number(chipsArray[1]);
+
+        //UPDATE EACH PLAYERS' CHIPS
         await player.update(
           {
-            chips: playerChips,
+            chips: newPlayerChips,
           },
           {
             transaction,
@@ -312,9 +311,10 @@ class GameController {
         );
       }
 
+      //UPDATE BANKER CHIPS
       await user.update(
         {
-          chips: bankerChips,
+          chips: newBankerChips,
         },
         { transaction }
       );

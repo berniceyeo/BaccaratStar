@@ -42,6 +42,8 @@ socket.on("started", async (turn) => {
   const response = await axios.get("/game/gamestate");
   const seatId = response.data.seatId;
   const userGameState = response.data.game.game_state[seatId];
+  const users = response.data.game.users;
+  presentingStatus(users, seatId);
   displayCardsPoints(userGameState);
   //check if user has a new bet
   const newBet = localStorage.getItem("newbet");
@@ -81,6 +83,8 @@ socket.on("skip-turn", async (turn) => {
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
   clearInterval(startCountdown);
+  startCountdown = false;
+  console.log("check interval", startCountdown);
   const newTurn = await change(turn, seatId);
   if (newTurn !== 1) {
     startCountdown = setInterval(() => {
@@ -194,10 +198,12 @@ const gameStart = async () => {
       throw new Error("no other players");
     }
     const gameState = response.data.game.game_state;
+    const users = response.data.game.users;
     const user = response.data.user;
     const room = user.room_id;
     const chips = user.chips;
     const seatId = user.seat_id;
+    presentingStatus(users, seatId);
     chipsSection.innerHTML = chips;
 
     const turn = gameState.turn;
@@ -236,6 +242,8 @@ const change = async (oldTurn, seatId) => {
   if (newTurn === 1) {
     console.log("banker's turn");
     clearInterval(startCountdown);
+    startCountdown = false;
+    console.log(startCountdown);
     // if turn is 1, then after banker's turn to end it
     const end = setTimeout(endGame, 20000);
   }
@@ -254,6 +262,7 @@ const takeCard = async () => {
   } else if (turn === 1) {
     console.log("end of banker's turn");
     clearInterval(startCountdown);
+    startCountdown = false;
     //as the banker has chosen to skip his turn
     const end = setTimeout(endGame, 1000);
   }
@@ -272,6 +281,8 @@ const skipTurn = async () => {
   } else if (turn === 1) {
     console.log("end of banker's turn");
     clearInterval(startCountdown);
+    startCountdown = false;
+    console.log("clearInterval", startCountdown);
     //as the banker has chosen to skip his turn
     const end = setTimeout(endGame, 1000);
   }
@@ -325,13 +336,8 @@ const endGame = async () => {
   //if the user is not banker, they will show the win/lose
   let innerContent = "";
   for (const [key, value] of Object.entries(winStatus)) {
-    if (value === "Win") {
-      innerContent += `Seat ${key} : Lose <br>`;
-    } else if (value === "Lose") {
-      innerContent += `Seat ${key} : Win <br>`;
-    } else if (value === "Draw") {
-      innerContent += `Seat ${key} : Draw <br>`;
-    }
+    const newContent = reversingWinStatus(key, value);
+    innerContent += newContent;
   }
   resultsModalBody.innerHTML = innerContent;
   document.getElementById("results-modal-btn").click();

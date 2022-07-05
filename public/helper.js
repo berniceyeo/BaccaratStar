@@ -104,6 +104,31 @@ const displayCardsPoints = (data) => {
   controls.hidden = false;
 };
 
+const reversingWinStatus = (key, value) => {
+  let innerContent = "";
+  if (value === "Win") {
+    innerContent += `Seat ${key} : Lose <br>`;
+  } else if (value === "Win-Double") {
+    innerContent += `Seat ${key} : Lose Double <br>`;
+  } else if (value === "Win-Triple") {
+    innerContent += `Seat ${key} : Lose Triple <br>`;
+  } else if (value === "Win-Five Times") {
+    innerContent += `Seat ${key} : Lose Five Times <br>`;
+  } else if (value === "Lose") {
+    innerContent += `Seat ${key} : Win <br>`;
+  } else if (value === "Lose-Double") {
+    innerContent += `Seat ${key} : Win Double <br>`;
+  } else if (value === "Lose-Triple") {
+    innerContent += `Seat ${key} : Win Triple <br>`;
+  } else if (value === "Lose-Five Times") {
+    innerContent += `Seat ${key} : Win Five Times <br>`;
+  } else if (value === "Draw") {
+    innerContent += `Seat ${key} : Draw <br>`;
+  }
+  console.log("innner", innerContent);
+  return innerContent;
+};
+
 const highlightingSeat = (turn, seatId) => {
   if (turn === seatId) {
     const turnSeat = document.getElementById("mainseat-back");
@@ -138,32 +163,55 @@ const highlightingOtherSeats = (users, string) => {
   }
 };
 
-const presentingStatus = (users, seatId) => {
+const presentingStatus = (data, seatId) => {
   document.getElementById("game-results-btn").hidden = false;
   const table = document.getElementById("game-results-table");
+  const status = localStorage.getItem("status"); //null if have yet to b created
+
+  //for when its a single entry
+  let users;
+  if (Array.isArray(data) === false) {
+    users = [data];
+  } else {
+    users = [...data];
+  }
 
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
-    const row = table.insertRow(i + 1);
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const cell3 = row.insertCell(2);
-    const cell4 = row.insertCell(3);
-    if (user.banker === true) {
-      cell1.innerHTML = "Banker";
-    } else {
-      cell1.innerHTML = user.username;
-      cell1.classList.add("text-capitalize");
-    }
+    if (document.getElementById(`status-${user.id}`) === null) {
+      console.log("generating new");
+      //check if the user information is already found in the table
+      const row = table.insertRow();
+      row.id = `status-${user.id}`;
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+      const cell3 = row.insertCell(2);
+      const cell4 = row.insertCell(3);
+      if (user.banker === true) {
+        cell1.innerHTML = "Banker";
+      } else {
+        cell1.innerHTML = user.username;
+        cell1.classList.add("text-capitalize");
+      }
 
-    cell2.innerHTML = user.chips_bought;
-    cell3.innerHTML = user.chips;
-    cell4.innerHTML = Number(user.chips) - Number(user.chips_bought);
+      cell2.innerHTML = user.chips_bought;
+      cell3.innerHTML = user.chips;
+      cell4.innerHTML = Number(user.chips) - Number(user.chips_bought);
 
-    if (user.seat_id === seatId) {
-      row.classList.add("table-warning");
+      if (user.seat_id === seatId) {
+        row.classList.add("table-warning");
+      } else {
+        row.style.color = "white";
+      }
     } else {
-      row.style.color = "white";
+      //if the document does have the user infromation, update the info
+      console.log("changing old");
+      const row = document.getElementById(`status-${user.id}`);
+      console.log(row.cells);
+      row.cells.item(1).innerHTML = user.chips_bought;
+      row.cells.item(2).innerHTML = user.chips;
+      row.cells.item(3).innerHTML =
+        Number(user.chips) - Number(user.chips_bought);
     }
   }
 };
