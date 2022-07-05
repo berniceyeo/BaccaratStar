@@ -7,6 +7,7 @@ const skipTurnBtn = document.getElementById("skip-turn-btn");
 const buyMoreBtn = document.getElementById("buy-chips-btn");
 const showChangeBetBtn = document.getElementById("show-change-bet");
 const changeBetBtn = document.getElementById("change-bet-btn");
+const endGameBtn = document.getElementById("final-end-btn");
 //SEATS SECTIONS
 const seatsBefore = document.getElementById("seats-bef");
 const mainSeat = document.getElementById("main-seat");
@@ -27,7 +28,8 @@ const controls = document.getElementById("controls");
 const waitingMessage = document.getElementById("waiting-message");
 const resultsModalBody = document.getElementById("results");
 const navUsername = document.getElementById("navbarDropdown");
-//start countdown, change turns after 20 seconds
+
+//INTERVALS USED FOR COUNTDOWNS
 let startCountdown;
 let end;
 
@@ -112,6 +114,19 @@ socket.on("forced-removal", async (data) => {
   }
 });
 
+socket.on("finalend", async (data) => {
+  removeHighlighting();
+  takeCardBtn.disabled = true;
+  skipTurnBtn.disabled = true;
+  points.innerHTML = "";
+  stopTimer();
+  clearCards();
+  $("#leave-room-modal").modal("hide");
+  document.getElementById("game-results-modalLabel").innerHTML =
+    "GAME HAS ENDED! <br> Here are the Results of the Game! ";
+  document.getElementById("game-results-btn").click();
+});
+
 socket.on("stop-game", async (data) => {
   console.log("no players left");
   //if the game is still ongoing, end the game
@@ -119,6 +134,16 @@ socket.on("stop-game", async (data) => {
   clearCards();
   //reload to refresh stats
   window.location.reload();
+  alert("last player has left, game has stopped");
+});
+
+socket.on("player-bought", async (chipsInfo) => {
+  const userId = chipsInfo.userId;
+  const newChips = chipsInfo.newChips;
+  const chipsBought = chipsInfo.chipsBought;
+  const row = document.getElementById(`status-${userId}`);
+  row.cells.item(1).innerHTML = chipsBought;
+  row.cells.item(2).innerHTML = newChips;
 });
 
 socket.on("ended", async (winStatus) => {
@@ -174,6 +199,7 @@ const init = async () => {
         reshuffleSeats(seatId);
         waitingMessage.hidden = false;
       } else {
+        endGameBtn.hidden = false;
         showChangeBetBtn.hidden = true;
         betDiv.hidden = true;
         pointsDiv.style.left = "48%";
@@ -208,6 +234,7 @@ const gameStart = async () => {
     if (response.data === "no other players") {
       throw new Error("no other players");
     }
+    endGameBtn.hidden = false;
     const gameState = response.data.game.game_state;
     const users = response.data.game.users;
     const user = response.data.user;
@@ -303,9 +330,17 @@ const buyMoreChips = async () => {
   };
   const response = await axios.put("game/buy-more", data);
   $("#buy-more-modal").modal("hide");
+  const userId = response.data.userId;
+  const roomId = response.data.roomId;
+  const chipsBought = response.data.chipsbought;
+  const newChips = response.data.newchips;
+  const row = document.getElementById(`status-${userId}`);
+  row.cells.item(1).innerHTML = chipsBought;
+  row.cells.item(2).innerHTML = newChips;
+  socket.emit("bought-more", [roomId, { userId, newChips, chipsBought }]);
   chipsSection.innerHTML = response.data.newchips;
-  document.getElementById("chips-bought").innerHTML = response.data.chipsbought;
-  document.getElementById("chips-hand").innerHTML = response.data.newchips;
+  document.getElementById("chips-bought").innerHTML = chipsBought;
+  document.getElementById("chips-hand").innerHTML = newChips;
   document.getElementById("buy-results-btn").click();
   setTimeout(() => {
     $("#buy-results-modal").modal("hide");
@@ -325,14 +360,13 @@ const changeBet = async () => {
 const showResults = () => {
   $("#leave-room-modal").modal("hide");
   document.getElementById("game-results-modalLabel").innerHTML =
-    "GAME IS ENDING! <br> Here are the Results of the Game! ";
+    "GAME HAS ENDED! <br> Here are the Results of the Game! ";
   document.getElementById("game-results-btn").click();
   setTimeout(() => {
     window.location.replace("http://localhost:3004/room");
   }, 2000);
 };
 
-//to end the game: only for banker side
 const endGame = async () => {
   const response = await axios.put("game/end");
   console.log(response);
@@ -389,6 +423,25 @@ const removeRoom = () => {
   } catch (error) {}
 };
 
+const finalEndGame = async () => {
+  const response = await axios.put("game/end");
+  const seatId = response.data.seatId;
+  const room = response.data.room;
+  controls.hidden = true;
+  takeCardBtn.disabled = true;
+  skipTurnBtn.disabled = true;
+  gameStartBtn.hidden = false;
+  stopTimer();
+  socket.emit("final-end", room);
+  removeHighlighting();
+  points.innerHTML = "";
+  clearCards();
+  $("#leave-room-modal").modal("hide");
+  document.getElementById("game-results-modalLabel").innerHTML =
+    "GAME HAS ENDED! <br> Here are the Results of the Game! ";
+  document.getElementById("game-results-btn").click();
+};
+
 const logout = async () => {
   const response = await axios.post("/logout");
   if (response.data === "logout") {
@@ -400,6 +453,7 @@ const logout = async () => {
 // BUTTONS EVENTS
 // ------------------------------------
 gameStartBtn.addEventListener("click", gameStart);
+endGameBtn.addEventListener("click", finalEndGame);
 leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
 buyMoreBtn.addEventListener("click", buyMoreChips);

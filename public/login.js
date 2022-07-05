@@ -38,6 +38,7 @@ getSignupPage.addEventListener("click", function() {
 //To toggle between the pages: from signup to login
 const getLoginPage = document.getElementById("get-login-form");
 getLoginPage.addEventListener("click", function() {
+  window.location.reload();
   signupForm.hidden = true;
   loginForm.hidden = false;
   landingPage.hidden = true;

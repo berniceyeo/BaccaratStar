@@ -209,7 +209,12 @@ class GameController {
         chips: newChips,
       });
 
-      res.send({ newchips: newChips, chipsbought: newChipsBought });
+      res.send({
+        userId,
+        newchips: newChips,
+        chipsbought: newChipsBought,
+        roomId,
+      });
     } catch (error) {
       console.log(error);
       res.send(error);

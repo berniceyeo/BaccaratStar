@@ -75,12 +75,26 @@ io.on("connection", (socket) => {
     socket.to(room).emit("skip-turn", turn);
   });
 
+  socket.on("bought-more", (data) => {
+    console.log("user-bought-more", data);
+    const room = data[0];
+    const chipsInfo = data[1];
+    socket.to(room).emit("player-bought", chipsInfo);
+  });
+
   // to display the results of the game
   socket.on("end-game", (data) => {
     console.log("ended", data);
     const room = data[0];
     const winStatus = data[1];
     socket.to(room).emit("ended", winStatus);
+  });
+
+  // to display the results of the game
+  socket.on("final-end", (data) => {
+    console.log("ended", data);
+    const room = data;
+    socket.to(room).emit("finalend", room);
   });
 
   // to display the results of the game
