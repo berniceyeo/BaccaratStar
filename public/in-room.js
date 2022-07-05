@@ -54,6 +54,10 @@ socket.on("started", async (turn) => {
     localStorage.removeItem("newbet");
   }
 
+  if (turn === seatId) {
+    startTimer();
+  }
+
   // to show on everyone pages whose turn it is
   highlightingSeat(turn, seatId);
   controlsDisableEnable(turn, seatId);
@@ -74,6 +78,9 @@ socket.on("changed-turn", async (data) => {
   const oldTurn = data.oldTurn;
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
+  if (newTurn === seatId) {
+    startTimer();
+  }
   controlsDisableEnable(newTurn, seatId);
   removeHighlighting(oldTurn, seatId);
   highlightingSeat(newTurn, seatId);
@@ -240,10 +247,10 @@ const change = async (oldTurn, seatId) => {
   highlightingSeat(newTurn, seatId);
 
   if (newTurn === 1) {
+    startTimer();
     console.log("banker's turn");
     clearInterval(startCountdown);
     startCountdown = false;
-    console.log(startCountdown);
     // if turn is 1, then after banker's turn to end it
     const end = setTimeout(endGame, 20000);
   }

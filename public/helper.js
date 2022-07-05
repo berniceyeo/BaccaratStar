@@ -231,3 +231,17 @@ const controlsDisableEnable = (turn, seatId) => {
     skipTurnBtn.disabled = false;
   }
 };
+
+const startTimer = () => {
+  const timer = document.getElementById("timer");
+  timer.innerHTML = "20";
+  let counter = 20;
+  const interval = setInterval(() => {
+    counter--;
+    timer.innerHTML = counter;
+    if (counter === 0) {
+      clearInterval(interval);
+      timer.innerHTML = "";
+    }
+  }, 1000);
+};
