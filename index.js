@@ -64,8 +64,8 @@ io.on("connection", (socket) => {
   socket.on("change-turn", (data) => {
     console.log("change turn", data);
     const room = data[0];
-    const turnInfo = data[1];
-    socket.to(room).emit("changed-turn", { ...turnInfo });
+    const newturn = data[1];
+    socket.to(room).emit("changed-turn", newturn);
   });
 
   socket.on("take-card", (data) => {

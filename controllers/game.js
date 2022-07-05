@@ -92,6 +92,11 @@ class GameController {
   changeTurn = async (req, res) => {
     try {
       const roomId = req.roomId;
+      const userId = req.userId;
+
+      const user = await this.db.User.findByPk(userId);
+      const seatId = user.seat_id;
+
       const getGame = await this.db.Room.findOne({
         where: {
           id: roomId,
@@ -136,7 +141,7 @@ class GameController {
       });
 
       //send the new game state
-      res.send({ turn: newTurn, room: roomId });
+      res.send({ turn: newTurn, room: roomId, seatId });
     } catch (error) {
       console.log(error);
       res.send(error.message);

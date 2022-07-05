@@ -141,13 +141,16 @@ const highlightingSeat = (turn, seatId) => {
   }
 };
 
-const removeHighlighting = (turn, seatId) => {
-  if (turn === seatId) {
-    const turnSeat = document.getElementById("mainseat-back");
-    turnSeat.classList.remove("turn");
-  } else {
-    const turnSeat = document.getElementById(`${turn}`);
-    turnSeat.classList.remove("turn");
+//clear highlighting
+const removeHighlighting = () => {
+  const turnSeat = document.getElementById("mainseat-back");
+  turnSeat.classList.remove("turn");
+  const allSeats = document.getElementsByClassName("seated");
+  for (let i = 0; i < allSeats.length; i++) {
+    const seat = allSeats[i];
+    if (seat.classList.contains("turn")) {
+      seat.classList.remove("turn");
+    }
   }
 };
 
@@ -232,16 +235,27 @@ const controlsDisableEnable = (turn, seatId) => {
   }
 };
 
+let timerInterval;
+
 const startTimer = () => {
   const timer = document.getElementById("timer");
-  timer.innerHTML = "20";
-  let counter = 20;
-  const interval = setInterval(() => {
+  timer.hidden = false;
+  timer.innerHTML = "10";
+  let counter = 10;
+  const timerInterval = setInterval(() => {
     counter--;
     timer.innerHTML = counter;
     if (counter === 0) {
-      clearInterval(interval);
+      clearInterval(timerInterval);
       timer.innerHTML = "";
     }
   }, 1000);
+};
+
+const stopTimer = () => {
+  clearInterval(timerInterval);
+  const timer = document.getElementById("timer");
+  timer.hidden = true;
+  timer.innerHTML = "";
+  console.log("cleared", timerInterval);
 };

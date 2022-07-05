@@ -29,6 +29,7 @@ const resultsModalBody = document.getElementById("results");
 const navUsername = document.getElementById("navbarDropdown");
 //start countdown, change turns after 20 seconds
 let startCountdown;
+let end;
 
 //
 //    SOCKET FUNCTIONS
@@ -57,7 +58,8 @@ socket.on("started", async (turn) => {
   if (turn === seatId) {
     startTimer();
   }
-
+  skipTurnBtn.addEventListener("click", skipTurn);
+  takeCardBtn.addEventListener("click", takeCard);
   // to show on everyone pages whose turn it is
   highlightingSeat(turn, seatId);
   controlsDisableEnable(turn, seatId);
@@ -73,30 +75,32 @@ socket.on("seated", async (data) => {
   presentingStatus(newUsers, userSeatId);
 });
 
+// FOR OTHER BESIDES THE BANKER
 socket.on("changed-turn", async (data) => {
+  console.log("newTurn", data);
   const newTurn = data.newTurn;
-  const oldTurn = data.oldTurn;
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
   if (newTurn === seatId) {
     startTimer();
   }
   controlsDisableEnable(newTurn, seatId);
-  removeHighlighting(oldTurn, seatId);
+  removeHighlighting();
   highlightingSeat(newTurn, seatId);
 });
 
 socket.on("skip-turn", async (turn) => {
   const response = await axios.get("/game/userstate");
   const seatId = response.data.seat_id;
-  clearInterval(startCountdown);
-  startCountdown = false;
-  console.log("check interval", startCountdown);
-  const newTurn = await change(turn, seatId);
-  if (newTurn !== 1) {
-    startCountdown = setInterval(() => {
-      change(newTurn, seatId);
-    }, 20000);
+
+  //only if its the banker
+  if (seatId === 1) {
+    //change the turn which inturn sets it up
+    change();
+    //reset the timer the turn which inturn sets it up
+    clearInterval(startCountdown);
+    clearTimeout(end);
+    changeTurn();
   }
 });
 
@@ -127,7 +131,7 @@ socket.on("ended", async (winStatus) => {
   const winState = winStatus[seatId];
   resultsModalBody.innerHTML = `You ${winState}`;
   document.getElementById("results-modal-btn").click();
-  removeHighlighting(1, seatId);
+  removeHighlighting();
   //AFTER 1 SEC TO HIDE MODAL OF RESULTS
   const hide = setTimeout(hideModal, 1000);
 });
@@ -221,9 +225,7 @@ const gameStart = async () => {
     socket.emit("start-game", [room, turn]);
     console.log(turn, seatId);
     controlsDisableEnable(turn, seatId);
-    startCountdown = setInterval(() => {
-      change(turn, seatId);
-    }, 20000);
+    changeTurn();
   } catch (error) {
     console.log(error);
     if (error.message === "no other players") {
@@ -234,27 +236,30 @@ const gameStart = async () => {
   }
 };
 
-// time out event to change turn every 20 seconds
-const change = async (oldTurn, seatId) => {
+const changeTurn = async () => {
+  startCountdown = setInterval(change, 10000);
+};
+
+const change = async () => {
   const response = await axios.put("game/turn-change");
-  console.log(oldTurn, seatId);
   const newTurn = response.data.turn;
   const room = response.data.room;
+  const seatId = response.data.seatId;
+  if (newTurn === seatId) {
+  }
   //send to socket that turn has been changed
-  socket.emit("change-turn", [room, { newTurn, oldTurn }]);
+  socket.emit("change-turn", [room, { newTurn }]);
   controlsDisableEnable(newTurn, seatId);
-  removeHighlighting(oldTurn, seatId);
+  removeHighlighting();
   highlightingSeat(newTurn, seatId);
 
   if (newTurn === 1) {
     startTimer();
     console.log("banker's turn");
     clearInterval(startCountdown);
-    startCountdown = false;
     // if turn is 1, then after banker's turn to end it
-    const end = setTimeout(endGame, 20000);
+    end = setTimeout(endGame, 10000);
   }
-  return newTurn;
 };
 
 const takeCard = async () => {
@@ -262,16 +267,15 @@ const takeCard = async () => {
   const { cards, turn, seatId, roomId } = response.data;
   takeCardBtn.disabled = true;
   skipTurnBtn.disabled = true;
-  // if the user is not the banker, should send to banker (game functionality is running)  takeCardBtn.disabled = true;
   displayCardsPoints(cards);
+  stopTimer();
+
   if (seatId !== 1) {
     socket.emit("take-card", [roomId, turn]);
   } else if (turn === 1) {
-    console.log("end of banker's turn");
     clearInterval(startCountdown);
-    startCountdown = false;
-    //as the banker has chosen to skip his turn
-    const end = setTimeout(endGame, 1000);
+    clearTimeout(end);
+    const quickEnd = setTimeout(endGame, 1000);
   }
 };
 
@@ -282,16 +286,14 @@ const skipTurn = async () => {
   const turn = game.game_state.turn;
   takeCardBtn.disabled = true;
   skipTurnBtn.disabled = true;
+  stopTimer();
 
   if (seatId !== 1) {
     socket.emit("take-card", [roomId, turn]);
   } else if (turn === 1) {
-    console.log("end of banker's turn");
     clearInterval(startCountdown);
-    startCountdown = false;
-    console.log("clearInterval", startCountdown);
-    //as the banker has chosen to skip his turn
-    const end = setTimeout(endGame, 1000);
+    clearTimeout(end);
+    const quickEnd = setTimeout(endGame, 1000);
   }
 };
 
@@ -348,7 +350,7 @@ const endGame = async () => {
   }
   resultsModalBody.innerHTML = innerContent;
   document.getElementById("results-modal-btn").click();
-  removeHighlighting(1, seatId);
+  removeHighlighting();
   for (let i = 1; i < 3; i++) {
     const seat = document.getElementById(`mainseat-${i}`);
     seat.hidden = true;
@@ -400,9 +402,9 @@ const logout = async () => {
 gameStartBtn.addEventListener("click", gameStart);
 leaveRoomBtn.addEventListener("click", exitRoom);
 removeRoomBtn.addEventListener("click", removeRoom);
+buyMoreBtn.addEventListener("click", buyMoreChips);
 takeCardBtn.addEventListener("click", takeCard);
 skipTurnBtn.addEventListener("click", skipTurn);
-buyMoreBtn.addEventListener("click", buyMoreChips);
 changeBetBtn.addEventListener("click", changeBet);
 showChangeBetBtn.addEventListener("click", () => {
   document.getElementById("change-bet-form").hidden = false;
