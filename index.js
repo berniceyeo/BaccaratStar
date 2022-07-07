@@ -26,6 +26,7 @@ dotenv.config({ path: path.normalize(envFilePath) });
 app.use(methodOverride("_method"));
 // Expose the files stored in the public folder
 app.use(express.static("public"));
+app.use(express.static("dist"));
 // Bind Express middleware to parse request bodies for POST requests
 app.use(express.urlencoded({ extended: false }));
 //  data in AJAX POST requests is packaged differently from those in form submissions

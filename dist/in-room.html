@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/3265fd33d4.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- <link href="/styles.css" rel="stylesheet" type="text/css" /> -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <title>Baccarat Star</title>
+  <script defer src="in-room-21baf12ea2c33fd11809.bundle.js"></script><link href="in-room.css" rel="stylesheet"></head>
+
+  <body class="bg-black">
+    <nav
+      class="navbar navbar-dark navbar-expand-sm bg-black h-auto d-flex align-items-center shadow"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="http://localhost:3004/">
+          <img src="./assets/images/logo.png" width="75" height="75" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-capitalize"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                User
+              </a>
+              <ul
+                class="dropdown-menu bg-dark"
+                aria-labelledby="navbarDropdown"
+              >
+                <li>
+                  <button class="dropdown-item btn text-navbar" id="nav-logout">
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item">
+              <!-- show modal of form to see players' chips -->
+
+              <button
+                type="button"
+                id="game-results-btn"
+                class="btn nav-link active "
+                data-bs-toggle="modal"
+                data-bs-target="#game-results-modal"
+                hidden
+              >
+                Status
+              </button>
+            </li>
+            <li class="nav-item">
+              <!-- show modal of form to change bet -->
+              <button
+                type="button"
+                id="show-change-bet"
+                class="btn nav-link active"
+                data-bs-toggle="modal"
+                data-bs-target="#change-bet-modal"
+                aria-current="page"
+              >
+                Change Bet
+              </button>
+            </li>
+            <li class="nav-item">
+              <!-- show modal of form to buy more chips -->
+              <button
+                type="button"
+                id="show-buy-more"
+                class="btn nav-link active"
+                data-bs-toggle="modal"
+                data-bs-target="#buy-more-modal"
+                aria-current="page"
+              >
+                Buy More
+              </button>
+            </li>
+            <li class="nav-item">
+              <!-- show modal of confirmation modal to make sure that the banker wants to leave  -->
+              <a class="nav-link active" aria-current="page" id="leave-room">
+                Leave Room
+              </a>
+            </li>
+            <li class="nav-item">
+              <!-- show modal of confirmation modal to make sure that the banker wants to leave  -->
+              <button
+                type="button"
+                id="final-end-btn"
+                class="btn nav-link active"
+                hidden
+              >
+                End Game
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div
+      id="table"
+      class="container-fluid bg-table h-auto position-relative"
+      style="min-height: 89.1vh;"
+    >
+      <!-- CHANGE BET -->
+      <div
+        class="modal fade"
+        id="change-bet-modal"
+        tabindex="-1"
+        aria-labelledby="change-bet-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="change-bet-modalLabel">
+                Change your Bet
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div id="bet-note" hidden>
+                <p>
+                  Bet has been changed, please note that the bet will only take
+                  into account only for the next round
+                </p>
+              </div>
+              <form id="change-bet-form">
+                <div>
+                  <label for="changebet" class="form-label mb-3"
+                    >New Bet
+                  </label>
+                  <div
+                    id="changebet-invalid"
+                    class="alert alert-danger"
+                    role="alert"
+                    hidden
+                  >
+                    Invalid
+                  </div>
+                  <input
+                    type="number"
+                    id="changebet"
+                    class="form-control mb-3"
+                    id="name"
+                    name="changebet"
+                    step="10"
+                    min="1"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" id="change-bet-btn" class="btn btn-warning">
+                Change Bet
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUY MORE -->
+      <div
+        class="modal fade"
+        id="buy-more-modal"
+        tabindex="-1"
+        aria-labelledby="buy-more-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="buy-more-modalLabel">
+                Buy More Chips
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div>
+                  <label for="buychips" class="form-label mb-3"
+                    >Chips to Buy
+                  </label>
+                  <div
+                    id="buychips-invalid"
+                    class="alert alert-danger"
+                    role="alert"
+                    hidden
+                  >
+                    Invalid
+                  </div>
+                  <input
+                    type="number"
+                    id="buychips"
+                    class="form-control mb-3"
+                    id="name"
+                    name="buychips"
+                    step="10"
+                    min="1"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" id="buy-chips-btn" class="btn btn-warning">
+                Buy More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Button trigger modal -->
+      <button
+        type="button"
+        id="buy-results-btn"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#buy-results-modal"
+        hidden
+      >
+        Show Chips
+      </button>
+
+      <!-- Chips Bought Modal -->
+      <div
+        class="modal fade"
+        id="buy-results-modal"
+        tabindex="-1"
+        aria-labelledby="buy-results-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="buy-results-modalLabel">
+                Player Chips
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body" style="color: white;">
+              <table class="table table-bordered  ">
+                <thead>
+                  <tr style="color: white; text-align: center;">
+                    <th scope="col">Chips Bought</th>
+                    <th scope="col">Chips in Hand</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="color: rgb(255, 189, 89); text-align: center;">
+                    <td id="chips-bought"></td>
+                    <td id="chips-hand"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chips Bought Modal -->
+      <div
+        class="modal fade"
+        id="game-results-modal"
+        tabindex="-1"
+        aria-labelledby="game-results-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header" id="game-results-header">
+              <h5 class="modal-title" id="game-results-modalLabel">
+                Status
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body" style="color: white;">
+              <table class="table table-bordered" id="game-results-table">
+                <thead>
+                  <tr style="color: white; text-align: center;">
+                    <th scope="col">User</th>
+                    <th scope="col">Chips Bought</th>
+                    <th scope="col">Chips in Hand</th>
+                    <th scope="col">Win/Lose</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Button trigger modal -->
+      <button
+        type="button"
+        id="leave-room-modal-btn"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#leave-room-modal"
+        hidden
+      >
+        Leave Room
+      </button>
+
+      <!-- Leave Room Modal -->
+      <div
+        class="modal fade"
+        id="leave-room-modal"
+        tabindex="-1"
+        aria-labelledby="leave-room-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <h5 class="modal-title" id="leave-room-modalLabel">
+                Leaving Room
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              You are currently the banker of the room. If you leave the room,
+              the room will be deleted and all players will be removed from the
+              room.
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" id="remove-room" class="btn btn-warning">
+                Leave Room
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Button trigger modal -->
+      <button
+        type="button"
+        id="results-modal-btn"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#results-modal"
+        hidden
+      >
+        Results
+      </button>
+
+      <!-- Results Modal -->
+      <div
+        class="modal fade"
+        id="results-modal"
+        tabindex="-1"
+        aria-labelledby="results-modalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-black">
+            <div class="modal-header">
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div
+              class="modal-body text-center"
+              id="results"
+              style="font-size: 30px;"
+            ></div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-warning"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- SEATS BEFORE SEATING  -->
+      <div id="seats-bef" hidden>
+        <div
+          class="alert alert-warning text-center position-absolute"
+          id="pick-seat-message"
+          style="margin:auto; bottom: 6%;"
+          role="alert"
+          hidden
+        >
+          Please pick the seat that you would like to take
+        </div>
+        <button id="seat-11" class="seats" style="top: 6%; left: 25%">
+          Sit
+        </button>
+        <button
+          id="seat-1"
+          class="seats banker"
+          style="top: 3%; right: 44%;"
+          disabled
+        >
+          Banker
+        </button>
+        <button id="seat-2" class="seats" style="top: 6%; right: 25%">
+          Sit
+        </button>
+        <button id="seat-10" class="seats" style="top: 22%; left: 12%">
+          Sit
+        </button>
+        <button id="seat-3" class="seats" style="top: 22%; right: 12%">
+          Sit
+        </button>
+        <button id="seat-9" class="seats" style="top: 38%; left: 10%">
+          Sit
+        </button>
+        <button id="seat-4" class="seats" style="top: 38%; right: 10%">
+          Sit
+        </button>
+        <button id="seat-8" class="seats" style="bottom: 35%; left: 15%">
+          Sit
+        </button>
+        <button id="seat-5" class="seats" style="bottom: 35%; right: 15%">
+          Sit
+        </button>
+        <button id="seat-7" class="seats" style="bottom: 28%; left: 35%">
+          Sit
+        </button>
+        <button id="seat-6" class="seats" style="bottom: 28%; right: 35%">
+          Sit
+        </button>
+      </div>
+
+      <!-- SEATS AFTER SEATING  -->
+      <div id="seats-after" hidden>
+        <div
+          class="alert alert-warning text-center"
+          id="waiting-message"
+          style="margin:auto"
+          role="alert"
+          hidden
+        >
+          Game has yet to start! EXCITING
+        </div>
+        <button id="2" class="seated" style="bottom: 28%; left: 25%">
+          Sit
+        </button>
+        <button id="3" class="seated" style="top: 45%; left: 12%">
+          Sit
+        </button>
+        <button id="4" class="seated" style=" top: 27%; left: 10%">
+          Sit
+        </button>
+        <button id="5" class="seated" style="top: 10%; left: 16%">
+          Sit
+        </button>
+        <button id="6" class="seated" style="top: 3%; left: 35%">
+          Sit
+        </button>
+        <button id="7" class="seated" style="top: 3%; right: 35%">
+          Sit
+        </button>
+        <button id="8" class="seated" style="top: 10%; right: 16%">
+          Sit
+        </button>
+        <button id="9" class="seated" style=" top: 27%; right: 10%">
+          Sit
+        </button>
+        <button id="10" class="seated" style="top: 45%; right: 12%">
+          Sit
+        </button>
+        <button id="11" class="seated" style=" bottom: 28%; right: 25%">
+          Sit
+        </button>
+
+        <div id="main-seat">
+          <div
+            id="bet-div"
+            class="position-absolute"
+            style="width:18%; height:20%; bottom: 15%; left: 50%; color:rgb(255,255,255,0.6)"
+          >
+            <i class="fa-solid fa-coins"></i>
+            <span id="bet"></span>
+          </div>
+          <div
+            id="points-div"
+            class="position-absolute"
+            style="width:18%; height:20%; bottom: 15%; left: 46%; color:rgb(255,255,255,0.6)"
+          >
+            <i class="fa-solid fa-hashtag"></i>
+            <span id="points"></span>
+          </div>
+          <div
+            class="position-absolute"
+            id="mainseat-back"
+            style="width:18%; height:20%; bottom: 8%; left: 41%; border: 1px solid rgb(255,255,255,0.4); "
+          ></div>
+          <div
+            id="mainseat-1"
+            class="card"
+            style="width:7.5%; height:17%; bottom: 10%; left: 44%; background-position: right;"
+            hidden
+          ></div>
+          <div
+            id="mainseat-2"
+            class="card"
+            style="width:7.5%; height:17%; bottom: 10%; left: 48%;   background-position: left;"
+            hidden
+          ></div>
+          <div
+            id="mainseat-3"
+            class="card"
+            style="width:7.5%; height:17%; bottom: 10%; left: 49%;   background-position: left;"
+            hidden
+          ></div>
+        </div>
+        <div class="position-absolute" style="bottom: 5%; right: 5%">
+          <button id="start" class="main-btn p-4">Start Game</button>
+        </div>
+
+        <!-- MAIN CONTROLS  -->
+        <div
+          id="controls"
+          class="position-absolute"
+          style="bottom: 5%; right: 5%"
+          hidden
+        >
+          <div class="container">
+            <div class="row justify-content-end">
+              <div class="col-4 second-btn p-3 align-self-end text-end">
+                <i class="fa-solid fa-wallet"></i> <span id="chips"></span>
+              </div>
+              <div class="col-4 second-btn p-3 align-self-end text-end">
+                <i class="fa-solid fa-stopwatch"></i> <span id="timer"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="d-grid gap-2 col-sm-6 col-12 mx-auto p-0">
+                <button
+                  id="take-card"
+                  class="main-btn p-4"
+                  style="margin-right: 2px"
+                  disabled
+                >
+                  Take Card
+                </button>
+              </div>
+              <div class="d-grid gap-2 col-sm-6 col-12 mx-auto p-0">
+                <button
+                  id="skip-turn-btn"
+                  class="secondary-btn p-4"
+                  style="margin-right: 2px"
+                  disabled
+                >
+                  Skip Turn
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="/helper.js"></script>
+    <script src="/in-room.js"></script> -->
+  </body>
+</html>
