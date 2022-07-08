@@ -2,8 +2,8 @@
 .DS_Store
 
 # Dependency directories
-node_modules/
-dist/
+/node_modules
+/dist
 
 # Photos uploaded by user
 uploads/*
