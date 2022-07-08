@@ -1,11 +1,11 @@
-import sequelizePackage, { BelongsToMany } from "sequelize";
+import { Sequelize } from "sequelize";
 import allConfig from "../../sequelize.config.cjs";
+import url from "url";
 
 // importing models
 import initUserModel from "./user.mjs";
 import initRoomModel from "./room.mjs";
 
-const { Sequelize } = sequelizePackage;
 const env = process.env.NODE_ENV || "development";
 const config = allConfig[env];
 const db = {};
