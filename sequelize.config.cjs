@@ -21,7 +21,6 @@ module.exports = {
     protocol: "postgres",
     dialectOptions: {
       ssl: {
-        // https://github.com/sequelize/sequelize/issues/12083
         require: true,
         rejectUnauthorized: false,
       },
