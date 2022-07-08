@@ -1,5 +1,4 @@
 import "core-js";
-import { DllReferencePlugin } from "webpack";
 import "../css/styles.css";
 import { toggleValidity } from "./helper.js";
 import { siteImages } from "./imageSources.js";
