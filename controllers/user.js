@@ -1,8 +1,4 @@
 import getHash from "../helperfunctions/hash.js";
-import cookieParser from "cookie-parser";
-import { resolve } from "path";
-import validationTypes from "../helperfunctions/validation.js";
-
 class UserController {
   constructor(db) {
     this.db = db;

@@ -18,12 +18,7 @@ import {
   clearCards,
   reshuffleSeats,
 } from "./helper.js";
-
-function importAll(r) {
-  r.keys().forEach(r);
-}
-
-importAll(require.context("../assets/images/", true, /\.jpg\.svg\.png$/));
+import { siteImages } from "./imageSources.js";
 
 // BUTTONS
 const gameStartBtn = document.getElementById("start");
@@ -194,6 +189,12 @@ socket.on("ended", async (winStatus) => {
 
 const init = async () => {
   try {
+    const logo = document.getElementById("brand");
+    logo.src = siteImages.logo;
+    const tableImage = siteImages.table;
+    document.querySelector(
+      ".bg-table"
+    ).style.backgroundImage = `url(${tableImage})`;
     const response = await axios.get("/game/userstate");
     const user = response.data;
     const room = user.room_id;

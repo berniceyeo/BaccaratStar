@@ -1,3 +1,5 @@
+import { cardImageSources } from "./imageSources.js";
+
 //HELPER FUNCIONS
 export const toggleValidity = (element, validity) => {
   if (validity === "valid") {
@@ -84,7 +86,10 @@ export const displayCardsPoints = (data) => {
     stringSum = String(sum).slice(-1);
     const card = document.getElementById(`mainseat-${i + 1}`);
     card.innerHTML = "";
-    card.style.backgroundImage = `url(${data[i].pic})`;
+    const picSourceSuit = data[i].suit;
+    const picSourceRank = data[i].rank;
+    const picSourceURL = cardImageSources[picSourceSuit][picSourceRank];
+    card.style.backgroundImage = `url(${picSourceURL})`;
     card.hidden = false;
   }
   if (data.length === 3) {

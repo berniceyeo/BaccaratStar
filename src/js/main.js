@@ -1,9 +1,8 @@
+import "core-js";
+import { DllReferencePlugin } from "webpack";
+import "../css/styles.css";
 import { toggleValidity } from "./helper.js";
-function importAll(r) {
-  r.keys().forEach(r);
-}
-
-importAll(require.context("../images/", true, /\.jpg\.svg\.png$/));
+import { siteImages } from "./imageSources.js";
 
 // LOGIN FORM ELEMENTS
 const loginForm = document.getElementById("login-form");
@@ -127,3 +126,13 @@ const postSignup = () => {
 
 loginBtn.addEventListener("click", postLogin);
 signupBtn.addEventListener("click", postSignup);
+
+// putting images in the html
+const logo = document.getElementById("brand");
+logo.src = siteImages.logo;
+const mainLogo = document.getElementById("main-logo");
+mainLogo.src = siteImages.transparentlogo;
+const mainImage = siteImages.main;
+const imageDiv = document.querySelector(".bg-image");
+console.log(imageDiv);
+imageDiv.style.backgroundImage = `url(${mainImage})`;

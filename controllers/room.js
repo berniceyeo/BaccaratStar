@@ -25,7 +25,6 @@ class RoomController {
     try {
       const { userId } = req;
       const { roomId } = req;
-      const user = await this.db.User.findByPk(userId);
       const room = await this.db.Room.findOne({
         where: {
           id: roomId,
@@ -234,7 +233,7 @@ class RoomController {
           },
         });
 
-        if (room.users.length >= 1) {
+        if (room.users.length <= 1) {
           throw new Error("User is last user");
         }
         res.send("left room");

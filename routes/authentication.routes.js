@@ -8,7 +8,7 @@ const router = Router();
 const userController = new UserController(db);
 
 router.get("/", (req, res) => {
-  res.sendFile(resolve("./views/main.html"));
+  res.sendFile(resolve("dist", "main.html"));
 });
 
 router.post("/login", userController.loginUser);
@@ -16,11 +16,11 @@ router.post("/logout", userController.logoutUser);
 router.post("/signup", userController.createUser);
 
 router.get("/room", authenticate, (req, res) => {
-  res.sendFile(resolve("./views/pre-room.html"));
+  res.sendFile(resolve("dist", "pre-room.html"));
 });
 
 router.get("/game", authenticate, (req, res) => {
-  res.sendFile(resolve("./views/in-room.html"));
+  res.sendFile(resolve("dist", "in-room.html"));
 });
 
 export default router;

@@ -25,7 +25,7 @@ dotenv.config({ path: path.normalize(envFilePath) });
 // Bind method override middleware to parse PUT and DELETE requests sent as POST requests
 app.use(methodOverride("_method"));
 // Expose the files stored in the public folder
-app.use(express.static("public"));
+app.use(express.static("assets"));
 app.use(express.static("dist"));
 // Bind Express middleware to parse request bodies for POST requests
 app.use(express.urlencoded({ extended: false }));

@@ -81,7 +81,7 @@ body {
 }
 
 .bg-image {
-  background-image: url("../assets/images/main.jpg");
+  /* background-image: url("../assets/images/main.jpg"); */
   background-repeat: no-repeat;
   background-size: 85% 100%;
 }
@@ -91,7 +91,7 @@ body {
 }
 
 .bg-table {
-  background-image: url("../assets/images/poker-table.jpg");
+  /* background-image: url("../assets/images/poker-table.jpg"); */
   background-repeat: no-repeat;
   background-size: 75% 70%;
   background-position: center top;

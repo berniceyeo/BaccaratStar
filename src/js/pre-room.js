@@ -1,10 +1,8 @@
 // IMPORT
+import "core-js";
+import "../css/styles.css";
 import { checkBlanks, toggleValidity } from "./helper.js";
-function importAll(r) {
-  r.keys().forEach(r);
-}
-
-importAll(require.context("../images/", true, /\.jpg\.svg\.png$/));
+import { siteImages } from "./imageSources.js";
 
 // BUTTONS
 const showCreateRoomBtn = document.getElementById("get-create-room");
@@ -67,6 +65,12 @@ const logout = async () => {
 };
 
 const init = async () => {
+  const logo = document.getElementById("brand");
+  logo.src = siteImages.logo;
+  const tableImage = siteImages.table;
+  document.querySelectorAll(
+    ".bg-table"
+  ).style.backgroundImage = `url(${tableImage})`;
   const response = await axios.get("/game/userstate");
   const name = response.data.username;
   if (name !== null || undefined) {

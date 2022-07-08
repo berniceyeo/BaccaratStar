@@ -69,16 +69,17 @@ const config = {
       },
       {
         test: /\.(png|jpg|gif|svg|jpeg)$/i,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              output: "images/",
-              publicPath: "images/",
-            },
-          },
-        ],
+        type: "asset/resource",
+        // use: [
+        //   {
+        //     loader: "file-loader",
+        //     options: {
+        //       name: "[name].[ext]",
+        //       output: "/assets/images",
+        //       publicPath: "assets/images/",
+        //     },
+        //   },
+        // ],
       },
     ],
   },
