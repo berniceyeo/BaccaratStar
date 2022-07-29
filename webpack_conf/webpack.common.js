@@ -51,6 +51,7 @@ const config = {
             loader: "babel-loader", //transforms ES5 to ES6
             options: {
               presets: ["@babel/preset-env"],
+              plugins: ["@babel/plugin-transform-object-assign"],
             },
           },
         ],
@@ -68,18 +69,12 @@ const config = {
         },
       },
       {
+        test: /\.js$/,
+        loader: "webpack-remove-debug", // remove "debug" package
+      },
+      {
         test: /\.(png|jpg|gif|svg|jpeg)$/i,
         type: "asset/resource",
-        // use: [
-        //   {
-        //     loader: "file-loader",
-        //     options: {
-        //       name: "[name].[ext]",
-        //       output: "/assets/images",
-        //       publicPath: "assets/images/",
-        //     },
-        //   },
-        // ],
       },
     ],
   },

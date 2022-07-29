@@ -1,5 +1,8 @@
 import { cardImageSources } from "./imageSources.js";
 
+const gameStartBtn = document.getElementById("start");
+const takeCardBtn = document.getElementById("take-card");
+
 //HELPER FUNCIONS
 export const toggleValidity = (element, validity) => {
   if (validity === "valid") {

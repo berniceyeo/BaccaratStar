@@ -68,10 +68,11 @@ const init = async () => {
   const logo = document.getElementById("brand");
   logo.src = siteImages.logo;
   const tableImage = siteImages.table;
-  document.querySelectorAll(
-    ".bg-table"
-  ).style.backgroundImage = `url(${tableImage})`;
+  const item = document.querySelector(".bg-table");
+  console.log(item);
+  item.style.backgroundImage = `url(${tableImage})`;
   const response = await axios.get("/game/userstate");
+  console.log(response);
   const name = response.data.username;
   if (name !== null || undefined) {
     navUsername.innerHTML = name;

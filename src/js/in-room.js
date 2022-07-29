@@ -22,6 +22,7 @@ import { siteImages } from "./imageSources.js";
 
 // BUTTONS
 const gameStartBtn = document.getElementById("start");
+console.log(gameStartBtn);
 const leaveRoomBtn = document.getElementById("leave-room");
 const removeRoomBtn = document.getElementById("remove-room");
 const takeCardBtn = document.getElementById("take-card");
